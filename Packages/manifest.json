@@ -1,10 +1,12 @@
 {
   "dependencies": {
+    "com.doji.mobilesam": "1.0.0",
     "com.unity.collab-proxy": "2.5.2",
     "com.unity.feature.development": "1.0.2",
     "com.unity.inputsystem": "1.11.0",
     "com.unity.learn.iet-framework": "4.0.2",
     "com.unity.learn.iet-framework.authoring": "1.2.2",
+    "com.unity.mobile.android-logcat": "1.4.3",
     "com.unity.multiplayer.center": "1.0.0",
     "com.unity.render-pipelines.universal": "17.0.3",
     "com.unity.sentis": "2.1.0",
@@ -48,5 +50,15 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "Doji",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.doji"
+      ],
+      "overrideBuiltIns": false
+    }
+  ]
 }

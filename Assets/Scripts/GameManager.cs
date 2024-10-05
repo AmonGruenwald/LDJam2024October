@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(CreatureSegmentation))]
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
@@ -13,9 +15,16 @@ public class GameManager : MonoBehaviour
     private Creature newCreature;
     private bool fightRunning = false;
     private RotateAroundObject rotationCamera;
+
+    private InputAction touchAction;
+
+    private CreatureSegmentation segmentation;
+
     void Start()
     {
-        currentCreature = CreatureCreator.CreateDummyCreature();
+        segmentation = GetComponent<CreatureSegmentation>();
+        touchAction = InputSystem.actions.FindAction("Touch");
+        //currentCreature = CreatureCreator.CreateDummyCreature();
         FightManager.OnFightComplete += HandleFightResult;
     }
 
@@ -48,6 +57,35 @@ public class GameManager : MonoBehaviour
         {
             DebugTrigger = false;
             newCreature = CreatureCreator.CreateCreature(createRandomTexture());
+            FightManager.StartFight(currentCreature, newCreature);
+            this.fightRunning = true;
+        }
+
+        if (touchAction.WasPerformedThisFrame()) {
+            Vector2 pos;
+            if (Touchscreen.current != null) {
+                pos = Touchscreen.current.primaryTouch.position.value;
+            }
+            else {
+                pos = Mouse.current.position.value;
+            }
+            Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+            Vector2 normalizedTouchPos = new Vector2(pos.x / screenSize.x, 1 - (pos.y / screenSize.y));
+            Debug.Log("Touch at  " + pos + ", screen size: " + screenSize + ", normalized pos: " + normalizedTouchPos);
+            var texture = segmentation.TakeSnapshot();
+            if (texture == null) {
+                return; // TODO: ???
+            }
+            
+            var segmentedTexture = segmentation.SegmentTexture(texture, normalizedTouchPos);
+            if (segmentedTexture == null) {
+                return; // TODO: ???
+            }
+
+            if (currentCreature == null) {
+                currentCreature = CreatureCreator.CreateDummyCreature();
+            }
+            newCreature = CreatureCreator.CreateCreature(segmentedTexture);
             FightManager.StartFight(currentCreature, newCreature);
             this.fightRunning = true;
         }

@@ -39,7 +39,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     {
         //TODO: set values based on description
         this.Speed = UnityEngine.Random.Range(1, 10);
-        this.Health = UnityEngine.Random.Range(1, 10);
+        this.Health = UnityEngine.Random.Range(5, 15);
         this.Defense = UnityEngine.Random.Range(1, 10);
         this.Strength = UnityEngine.Random.Range(1, 10);
         this.Evasion = UnityEngine.Random.Range(1, 10);

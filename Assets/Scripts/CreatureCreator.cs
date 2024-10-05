@@ -25,7 +25,7 @@ public class CreatureCreator : MonoBehaviour
         Creature creatureComponent = instantiatedObject.GetComponent<Creature>();
         creatureComponent
             .SetId(idCounter++)
-            .SetStats(1, 1, 1, 1, 1) // TODO figure default stats
+            .SetStats(1, 3, 1, 1, 1) // TODO figure default stats
             .SetImage(DummyImage);
         return creatureComponent;
     }
