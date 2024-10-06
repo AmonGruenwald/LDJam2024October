@@ -37,12 +37,12 @@ public class FightManager : MonoBehaviour
             b.Attack(a);
             Debug.Log("#" + b.id + " attacks #" + a.id + ": Health: " + prevHealth + "->" + a.Health);
         }
-        if (a.Health <= 0)
+        if (a.CurrentHealth <= 0)
         {
             Debug.Log("#"+a.id+" died");
             completeFight(b);
         }
-        else if(b.Health <= 0)
+        else if(b.CurrentHealth <= 0)
         {
             Debug.Log("#" + b.id + " died");
             completeFight(a);

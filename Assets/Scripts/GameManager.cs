@@ -33,7 +33,6 @@ public class GameManager : MonoBehaviour
     private RotateAroundObject rotationCamera;
 
     private InputAction touchAction;
-
     private CreatureSegmentation segmentation;
     private CreatureClassification classification;
     private GameObject provisionalBattlefield;
@@ -45,10 +44,10 @@ public class GameManager : MonoBehaviour
         segmentation = GetComponent<CreatureSegmentation>();
         classification = GetComponent<CreatureClassification>();
         touchAction = InputSystem.actions.FindAction("Touch");
-        //currentCreature = CreatureCreator.CreateDummyCreature();
         FightManager.OnFightComplete += HandleFightResult;
         creatureShowcaseUI.SetActive(false);
     }
+
 
     private void HandleFightResult(Creature winner)
     {
@@ -65,6 +64,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Game continues");
             Destroy(currentCreature.gameObject);
             currentCreature = newCreature;
+            currentCreature.CurrentHealth = currentCreature.Health;
         }
 
         if (provisionalBattlefield != null) {
@@ -73,7 +73,6 @@ public class GameManager : MonoBehaviour
         }
 
     }
-    // Update is called once per frame
     void Update()
     {
         if (FightManager.FightRunning)
@@ -241,7 +240,7 @@ public class GameManager : MonoBehaviour
         {
             for (int x = 0; x < 16; x++)
             {
-                Color randomColor = Random.ColorHSV();
+                Color randomColor = UnityEngine.Random.ColorHSV();
                 texture.SetPixel(x, y, randomColor);
             }
         }
