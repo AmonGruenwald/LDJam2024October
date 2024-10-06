@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float _minPlaneSize;
     [SerializeField] private GameObject provisionalBattlefieldPrefab;
     [SerializeField] private TextMeshProUGUI creatureText;
+    [SerializeField] private GameObject spawnParticles;
 
     private Creature currentCreature;
     private Creature newCreature;
@@ -108,6 +109,8 @@ public class GameManager : MonoBehaviour
 
         yield return null;
         
+        var spawnPosition = GetCreatureSpawnPosition(pos);
+        var particles = Instantiate(spawnParticles, spawnPosition, Quaternion.identity);
         yield return segmentation.SegmentTexture(texture, normalizedTouchPos);
         Destroy(texture);
         if (segmentation.SegmentResult == null) {
@@ -127,9 +130,14 @@ public class GameManager : MonoBehaviour
                     currentCreature = CreatureCreator.CreateDummyCreature();
                     currentCreature.gameObject.SetActive(false);
                 }
-                var spawnPosition = GetCreatureSpawnPosition(pos);
                 newCreature = CreatureCreator.CreateCreature(segmentedTexture, classification.Prediction, spawnPosition);
                 newCreature.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+
+                particles.GetComponent<ParticleSystem>().Stop();
+                Destroy(particles, 5);
+
+                yield return new WaitForSeconds(0.5f);
+
                 yield return CreatureShowcase(classification.Prediction, newCreature.name);
             }
         }
