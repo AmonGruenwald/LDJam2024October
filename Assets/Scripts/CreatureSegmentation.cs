@@ -1,13 +1,9 @@
-using System;
-using Doji.AI.Segmentation;
-using Unity.Collections;
+using System.Collections;
+using Unity.Sentis;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
 
 public class CreatureSegmentation : MonoBehaviour
 {
@@ -15,14 +11,12 @@ public class CreatureSegmentation : MonoBehaviour
     [SerializeField] private ARCameraManager cameraManager;
     [SerializeField] private RawImage previewImage;
 
-    private MobileSAM segmentation;
+    private MobileSAM segmentation; 
     
 
     private void Awake()
     {
-
         segmentation = new MobileSAM();
-        segmentation.Backend = Unity.Sentis.BackendType.CPU;
     }
 
     public Texture2D TakeSnapshot()
@@ -37,17 +31,22 @@ public class CreatureSegmentation : MonoBehaviour
         return textureNoAlpha;
     }
 
-    public Texture2D SegmentTexture(Texture2D texture, Vector2 tappedPointNormalized)
+    public Texture2D SegmentResult;
+    public Texture2D CroppedTextureWithBackground;
+
+    public IEnumerator SegmentTexture(Texture2D texture, Vector2 tappedPointNormalized)
     {
         Vector2 tappedPointTextureSpace = new Vector2(tappedPointNormalized.x * texture.width, tappedPointNormalized.y * texture.height);
         Debug.Log("point in texture space: " + tappedPointTextureSpace + ", width: " + texture.width + ", height: " + texture.height);
-        segmentation.SetImage(texture);
+        yield return segmentation.SetImage(texture);
 
         float[] pointCoords = new float[] { tappedPointTextureSpace.x, tappedPointTextureSpace.y };
         float[] pointLabels = new float[] { 1f };  // 1 for foreground point
-        segmentation.Predict(pointCoords, pointLabels);
+        yield return segmentation.PredictAsync(pointCoords, pointLabels);
         
         var segmentationTextureRt = segmentation.Result;
+
+        yield return null;
         
         RenderTexture currentActiveRT = RenderTexture.active;
         RenderTexture.active = segmentationTextureRt;
@@ -58,17 +57,25 @@ public class CreatureSegmentation : MonoBehaviour
 
         RenderTexture.active = currentActiveRT;
 
+        yield return null;
+
         Texture2D extracted = ExtractTexture(texture, segmentationTexture);
+       
+        yield return null;
+
         Rect bounds = GetTextureAlphaBoundingBox(segmentationTexture); // ATTENTION: might have size zero, add error handling
-        if (bounds.width == 0 || bounds.height == 0) {
-            return null;
+        if (bounds.width > 0 && bounds.height > 0) {
+            Texture2D cropped = CropTexture(extracted, (int) bounds.min.x, (int) bounds.min.y, (int) bounds.width, (int) bounds.height);
+            Rect boundsNormalized = new Rect(new Vector2(bounds.x / (float) segmentationTexture.width, bounds.y / (float) segmentationTexture.height),
+                new Vector2(bounds.width / (float) segmentationTexture.width, bounds.height / (float) segmentationTexture.height));
+            Rect boundsInTextureSpace = new Rect(new Vector2(boundsNormalized.x * (float) texture.width, boundsNormalized.y * (float) texture.height),
+                new Vector2(boundsNormalized.width * (float) texture.width, boundsNormalized.height * (float) texture.height));
+
+            CroppedTextureWithBackground = CropTexture(texture, (int) boundsInTextureSpace.min.x, (int) boundsInTextureSpace.min.y, (int) boundsInTextureSpace.width, (int) boundsInTextureSpace.height);
+            previewImage.texture = CroppedTextureWithBackground;
+            Destroy(extracted);
+            SegmentResult = cropped;
         }
-
-        Texture2D cropped = CropTexture(extracted, (int) bounds.min.x, (int) bounds.min.y, (int) bounds.width, (int) bounds.height);
-        Destroy(extracted);
-        // previewImage.texture = cropped;
-
-        return cropped;
     }
 
     public Texture2D CropTexture(Texture2D sourceTexture, int x, int y, int width, int height)

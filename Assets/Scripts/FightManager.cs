@@ -1,5 +1,7 @@
 using UnityEngine;
 using System;
+using System.Collections;
+using DG.Tweening;
 
 public class FightManager : MonoBehaviour
 {
@@ -46,10 +48,17 @@ public class FightManager : MonoBehaviour
             completeFight(a);
         }
     }
-    public void StartFight(Creature a, Creature b)
+    public IEnumerator StartFight(Creature a, Creature b, Transform fightSpot)
     {
-        a.gameObject.transform.position = FightSpot.position + FightSpot.right * Distance * 0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
-        b.gameObject.transform.position = FightSpot.position + FightSpot.right * Distance * -0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
+        if (fightSpot != null) {
+            FightSpot = fightSpot;
+        }
+
+        var targetPosA = FightSpot.position + FightSpot.right * Distance * 0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
+        a.transform.position = targetPosA;
+
+        var targetPosB = FightSpot.position + FightSpot.right * Distance * -0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
+        yield return b.transform.DOMove(targetPosB, 1f).WaitForCompletion();
         this.a = a;
         this.b = b;
         FightRunning = true;

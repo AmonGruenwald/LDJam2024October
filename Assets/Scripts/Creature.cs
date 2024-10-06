@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Creature : MonoBehaviour, IEquatable<Creature>
 {
+    public string Name;
     public float Speed;
     public float Health;
     public float Defense;
@@ -12,9 +13,15 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     public float Evasion;
     public int id;
 
+    private Renderer _renderer;
     private float currentAttackDeadline = 1.0f;
 
     public bool AttackRunning = false;
+
+    private void Awake() {
+        _renderer = GetComponentInChildren<Renderer>();
+    }
+
     public Creature SetId(int id)
     {
         this.id = id;
@@ -37,19 +44,22 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     }
     public Creature SetStats(CreatureDescription description)
     {
-        //TODO: set values based on description
-        this.Speed = UnityEngine.Random.Range(1, 10);
-        this.Health = UnityEngine.Random.Range(5, 15);
-        this.Defense = UnityEngine.Random.Range(1, 10);
-        this.Strength = UnityEngine.Random.Range(1, 10);
-        this.Evasion = UnityEngine.Random.Range(1, 10);
+        this.name = description.name;
+
+        //TODO: elemental
+        this.Speed = description.speed;
+        this.Health = description.health;
+        this.Defense = description.defense;
+        this.Strength = description.strength;
+        this.Evasion = description.evasion;
         return this;
     }
 
     public Creature SetImage(Texture2D image)
     {
-        Renderer renderer = this.GetComponentInChildren<Renderer>();
-        renderer.material.mainTexture = image;
+        // TODO: destroy old texture
+        _renderer.material.mainTexture = image;
+        AdjustScale();
         return this;
     }
 
@@ -120,7 +130,6 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     }
 
 
-
     private IEnumerator Damage(float finalDamage)
     {
         this.Health -= finalDamage;
@@ -136,5 +145,16 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     public bool Equals(Creature other)
     {
         return this.id.Equals(other.id);
+    }
+
+    public void AdjustScale()
+    {
+        var texture = _renderer.material.mainTexture;
+
+        float textureAspectRatio = (float)texture.width / texture.height;
+
+        Vector3 scale = transform.localScale;
+        scale.x = scale.y * textureAspectRatio;
+        transform.localScale = scale;
     }
 }

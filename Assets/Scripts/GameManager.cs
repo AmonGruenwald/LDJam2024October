@@ -1,7 +1,15 @@
+using System.Collections;
+using System.Linq;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 [RequireComponent(typeof(CreatureSegmentation))]
+[RequireComponent(typeof(CreatureClassification))]
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
@@ -11,26 +19,40 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     bool DebugTrigger = false;
 
+    [SerializeField] private GameObject creatureShowcaseUI;
+    [SerializeField] private Transform creatureShowcasePoint;
+    [SerializeField] private Button keepButton;
+    [SerializeField] private Button discardButton;
+    [SerializeField] private float _minPlaneSize;
+    [SerializeField] private GameObject provisionalBattlefieldPrefab;
+    [SerializeField] private TextMeshProUGUI creatureText;
+
     private Creature currentCreature;
     private Creature newCreature;
-    private bool fightRunning = false;
+    private GameState state = GameState.Picking;
     private RotateAroundObject rotationCamera;
 
     private InputAction touchAction;
 
     private CreatureSegmentation segmentation;
+    private CreatureClassification classification;
+    private GameObject provisionalBattlefield;
+
+    public Texture2D classificationTestTexture;
 
     void Start()
     {
         segmentation = GetComponent<CreatureSegmentation>();
+        classification = GetComponent<CreatureClassification>();
         touchAction = InputSystem.actions.FindAction("Touch");
         //currentCreature = CreatureCreator.CreateDummyCreature();
         FightManager.OnFightComplete += HandleFightResult;
+        creatureShowcaseUI.SetActive(false);
     }
 
     private void HandleFightResult(Creature winner)
     {
-        fightRunning = false;
+        state = GameState.Picking;
         if (winner.Equals(currentCreature))
         {
             Destroy(currentCreature.gameObject);
@@ -45,6 +67,11 @@ public class GameManager : MonoBehaviour
             currentCreature = newCreature;
         }
 
+        if (provisionalBattlefield != null) {
+            Destroy(provisionalBattlefield);
+            provisionalBattlefield = null;
+        }
+
     }
     // Update is called once per frame
     void Update()
@@ -56,39 +83,154 @@ public class GameManager : MonoBehaviour
         if (DebugTrigger)
         {
             DebugTrigger = false;
-            newCreature = CreatureCreator.CreateCreature(createRandomTexture());
-            FightManager.StartFight(currentCreature, newCreature);
-            this.fightRunning = true;
+            newCreature = CreatureCreator.CreateCreature(createRandomTexture(), new ClassificationPrediction(), GetCreatureSpawnPosition(Vector2.zero));
+            FightManager.StartFight(currentCreature, newCreature, null);
+            state = GameState.Fighting;
         }
 
-        if (touchAction.WasPerformedThisFrame()) {
-            Vector2 pos;
-            if (Touchscreen.current != null) {
-                pos = Touchscreen.current.primaryTouch.position.value;
-            }
-            else {
-                pos = Mouse.current.position.value;
-            }
-            Vector2 screenSize = new Vector2(Screen.width, Screen.height);
-            Vector2 normalizedTouchPos = new Vector2(pos.x / screenSize.x, 1 - (pos.y / screenSize.y));
-            Debug.Log("Touch at  " + pos + ", screen size: " + screenSize + ", normalized pos: " + normalizedTouchPos);
-            var texture = segmentation.TakeSnapshot();
-            if (texture == null) {
-                return; // TODO: ???
-            }
-            
-            var segmentedTexture = segmentation.SegmentTexture(texture, normalizedTouchPos);
+        if (state == GameState.Picking && touchAction.WasPerformedThisFrame()) {
+            state = GameState.CreatureConfirmation;
+            StartCoroutine(CreateCreatureFromImage());
+        }
+    }
+
+    private IEnumerator CreateCreatureFromImage() {
+        Vector2 pos;
+        if (Touchscreen.current != null) {
+            pos = Touchscreen.current.primaryTouch.position.value;
+        }
+        else {
+            pos = Mouse.current.position.value;
+        }
+        Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+        Vector2 normalizedTouchPos = new Vector2(pos.x / screenSize.x, 1 - (pos.y / screenSize.y));
+        Debug.Log("Touch at  " + pos + ", screen size: " + screenSize + ", normalized pos: " + normalizedTouchPos);
+        var texture = segmentation.TakeSnapshot();
+
+        yield return null;
+        
+        yield return segmentation.SegmentTexture(texture, normalizedTouchPos);
+        Destroy(texture);
+        if (segmentation.SegmentResult == null) {
+            state = GameState.Picking;
+        } else {
+            var segmentedTexture = segmentation.SegmentResult;
+            var croppedTexture = segmentation.CroppedTextureWithBackground;
             if (segmentedTexture == null) {
-                return; // TODO: ???
+                state = GameState.Picking; // Revert to picking state
+            } else {
+                classification.Classify(croppedTexture);
+                Destroy(croppedTexture);
+
+                yield return null;
+
+                if (currentCreature == null) {
+                    currentCreature = CreatureCreator.CreateDummyCreature();
+                    currentCreature.gameObject.SetActive(false);
+                }
+                var spawnPosition = GetCreatureSpawnPosition(pos);
+                newCreature = CreatureCreator.CreateCreature(segmentedTexture, classification.Prediction, spawnPosition);
+                newCreature.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+                yield return CreatureShowcase(classification.Prediction, newCreature.name);
+            }
+        }
+    }
+
+    private Vector3 GetCreatureSpawnPosition(Vector2 screenPos) {
+        var mainCamera = Camera.main;
+        Ray ray = mainCamera.ScreenPointToRay(screenPos);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.Log("Raycast hit " + hit.transform.gameObject.name + ", spawning at " + hit.point);
+            return hit.point;
+        } else {
+            Debug.Log("No raycast hit, spawning at " + hit.point);
+            return ray.GetPoint(3f);
+        }
+    }
+
+    private IEnumerator CreatureShowcase(ClassificationPrediction prediction, string name) {
+        creatureShowcaseUI.SetActive(true);
+
+        var text = $"{name}\n({prediction.categoryName} [{prediction.confidenceInPercent}%])";
+        creatureText.text = text;
+
+        float duration = 2f;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration) {
+            // Lerp position and rotation over time
+            newCreature.transform.position = Vector3.Lerp(newCreature.transform.position, creatureShowcasePoint.transform.position, elapsedTime / duration);
+            newCreature.transform.rotation = Quaternion.Lerp(newCreature.transform.rotation, creatureShowcasePoint.transform.rotation, elapsedTime / duration);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        newCreature.transform.position = creatureShowcasePoint.transform.position;
+        newCreature.transform.rotation = creatureShowcasePoint.transform.rotation;
+
+        newCreature.transform.SetParent(creatureShowcasePoint, true);
+        
+        bool keep = false;
+        bool discard = false;
+
+        keepButton.onClick.AddListener(() => keep = true);
+        discardButton.onClick.AddListener(() => discard = true);
+
+        while (!keep && !discard) {
+            yield return null;
+        }
+
+        keepButton.onClick.RemoveAllListeners();
+        discardButton.onClick.RemoveAllListeners();
+
+        newCreature.transform.SetParent(null);
+
+        if (keep) {
+            currentCreature.gameObject.SetActive(true);
+            var plane = GetNearestFittingPlane();
+            if (plane == null) {
+                var position = Camera.main.transform.position + Camera.main.transform.forward * 3f;
+                provisionalBattlefield = CreateProvisionalBattlefield(position);
+                plane = provisionalBattlefield;
             }
 
-            if (currentCreature == null) {
-                currentCreature = CreatureCreator.CreateDummyCreature();
-            }
-            newCreature = CreatureCreator.CreateCreature(segmentedTexture);
-            FightManager.StartFight(currentCreature, newCreature);
-            this.fightRunning = true;
+            state = GameState.Fighting;
+            StartCoroutine(FightManager.StartFight(currentCreature, newCreature, plane.transform));
+        } else {
+            state = GameState.Picking;
+            Destroy(newCreature.gameObject);
         }
+        creatureShowcaseUI.SetActive(false);
+    }
+
+    private GameObject GetNearestFittingPlane() {
+        var planes = FindObjectsByType<ARPlane>(FindObjectsSortMode.None)
+            .Where((plane) => (plane.size.x * plane.size.y) > _minPlaneSize && plane.alignment.IsHorizontal())
+            .ToArray();
+
+        if (planes.Length == 0) {
+            return null;
+        }
+
+        ARPlane nearestPlane = null;
+        float nearestPlaneDistance = float.PositiveInfinity;
+        foreach (var plane in planes) {
+            var dist = Vector3.Distance(Camera.main.transform.position, plane.transform.position);
+            if (dist < nearestPlaneDistance) {
+                nearestPlane = plane;
+                nearestPlaneDistance = dist;
+            }
+        }
+
+        return nearestPlane.gameObject;
+    }
+
+    private GameObject CreateProvisionalBattlefield(Vector3 position) {
+        return Instantiate(provisionalBattlefieldPrefab, position, Quaternion.identity);
     }
 
     private Texture2D createRandomTexture()
@@ -108,4 +250,10 @@ public class GameManager : MonoBehaviour
         texture.Apply();
         return texture;
     }
+}
+
+public enum GameState {
+    Picking,
+    CreatureConfirmation,
+    Fighting
 }
