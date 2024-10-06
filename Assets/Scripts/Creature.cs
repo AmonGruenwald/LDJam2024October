@@ -18,6 +18,8 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
 
     public bool AttackRunning = false;
 
+    public float CurrentHealth;
+
     private void Awake() {
         _renderer = GetComponentInChildren<Renderer>();
     }
@@ -36,6 +38,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     {
         this.Speed = speed;
         this.Health = health;
+        this.CurrentHealth = this.Health;
         this.Defense = defense;
         this.Strength = attack;
         this.Evasion = evasion;
@@ -49,6 +52,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         //TODO: elemental
         this.Speed = description.speed;
         this.Health = description.health;
+        this.CurrentHealth = this.Health;
         this.Defense = description.defense;
         this.Strength = description.strength;
         this.Evasion = description.evasion;
@@ -132,7 +136,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
 
     private IEnumerator Damage(float finalDamage)
     {
-        this.Health -= finalDamage;
+        this.CurrentHealth -= finalDamage;
         yield return this.gameObject.transform.DOShakePosition(0.5f, 0.3f, 20, 10.0f)
             .SetEase(Ease.OutElastic)
             .WaitForCompletion();
