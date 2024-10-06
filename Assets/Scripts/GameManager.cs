@@ -153,25 +153,18 @@ public class GameManager : MonoBehaviour
     private IEnumerator CreatureShowcase(ClassificationPrediction prediction, string name) {
         creatureShowcaseUI.SetActive(true);
 
-        var text = $"{name}\n({prediction.categoryName} [{prediction.confidenceInPercent}%])";
-        creatureText.text = text;
+        creatureText.SetText(name);
 
-        float duration = 2f;
-        float elapsedTime = 0f;
+        float duration = 1.5f;
 
-        while (elapsedTime < duration) {
-            // Lerp position and rotation over time
-            newCreature.transform.position = Vector3.Lerp(newCreature.transform.position, creatureShowcasePoint.transform.position, elapsedTime / duration);
-            newCreature.transform.rotation = Quaternion.Lerp(newCreature.transform.rotation, creatureShowcasePoint.transform.rotation, elapsedTime / duration);
+        newCreature.transform.SetParent(creatureShowcasePoint, true);
 
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
+        newCreature.transform.DOLocalRotateQuaternion(Quaternion.identity, duration).SetEase(Ease.InFlash).SetEase(Ease.OutBounce);
+        yield return newCreature.transform.DOLocalMove(Vector3.zero, duration).SetEase(Ease.InFlash).SetEase(Ease.OutBounce).WaitForCompletion();
 
         newCreature.transform.position = creatureShowcasePoint.transform.position;
         newCreature.transform.rotation = creatureShowcasePoint.transform.rotation;
 
-        newCreature.transform.SetParent(creatureShowcasePoint, true);
         
         bool keep = false;
         bool discard = false;
@@ -192,7 +185,7 @@ public class GameManager : MonoBehaviour
             currentCreature.gameObject.SetActive(true);
             var plane = GetNearestFittingPlane();
             if (plane == null) {
-                var position = Camera.main.transform.position + Camera.main.transform.forward * 3f;
+                var position = Camera.main.transform.position + Camera.main.transform.forward * 1.2f;
                 provisionalBattlefield = CreateProvisionalBattlefield(position);
                 plane = provisionalBattlefield;
             }

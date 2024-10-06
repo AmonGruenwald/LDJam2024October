@@ -30,7 +30,7 @@ public class GooglyEyeEffect : MonoBehaviour
         lastEyePosition = eye.position;
 
         pupilTarget += eyeMovement * Time.deltaTime * 50;
-        pupilTarget = Vector3.Lerp(pupilTarget, pupilBasePosition + Random.insideUnitSphere * 0.3f, Time.deltaTime * 5);
+        pupilTarget = Vector3.Lerp(pupilTarget, pupilBasePosition + Random.insideUnitSphere * 0.1f, Time.deltaTime * 5);
         Vector3 direction = pupilTarget.normalized;
         pupil.localPosition = direction * radius;
     }
