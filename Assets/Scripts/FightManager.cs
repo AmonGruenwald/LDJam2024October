@@ -13,6 +13,9 @@ public class FightManager : MonoBehaviour
     [SerializeField]
     public GameObject HealthBarPrefab;
 
+    public AudioClip normalMusic;
+    public AudioClip[] battleMusic;
+
     public bool FightRunning = false;
     public event Action<Creature> OnFightComplete;
 
@@ -22,6 +25,18 @@ public class FightManager : MonoBehaviour
 
     private HealthBar creatureABar;
     private HealthBar creatureBBar;
+
+    public AudioSource musicPlayer;
+
+    public void Start() {
+        musicPlayer = GetComponent<AudioSource>();
+        PlayNormalMusic();
+    }
+
+    private void PlayNormalMusic() {
+        musicPlayer.clip = normalMusic;
+        musicPlayer.Play();
+    }
 
     private void FixedUpdate()
     {
@@ -86,12 +101,41 @@ public class FightManager : MonoBehaviour
 
         SpawnHealthBars();
 
+        StartCoroutine(FadeToBattleMusic());
         FightRunning = true;
     }
+
+
     private void completeFight(Creature winner)
     {
         FightRunning = false;
         OnFightComplete(winner);
+        StartCoroutine(FadeOutBattleMusicAndPlayNormal());
+    }
+
+    private IEnumerator FadeToBattleMusic() {
+        yield return FadeoutMusic(0.5f);
+        var music = battleMusic[UnityEngine.Random.Range(0, battleMusic.Length)];
+        musicPlayer.clip = music;
+        musicPlayer.Play();
+    }
+
+    public IEnumerator FadeOutBattleMusicAndPlayNormal() {
+        yield return FadeoutMusic(2.0f);
+        PlayNormalMusic();
+    }
+
+    public IEnumerator FadeoutMusic(float FadeTime) {
+        float startVolume = musicPlayer.volume;
+
+        while (musicPlayer.volume > 0) {
+            musicPlayer.volume -= startVolume * Time.deltaTime / FadeTime;
+
+            yield return null;
+        }
+
+        musicPlayer.Stop();
+        musicPlayer.volume = startVolume;
     }
 
     private void SpawnHealthBars() {

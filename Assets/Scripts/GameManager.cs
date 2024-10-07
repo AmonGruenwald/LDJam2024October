@@ -112,9 +112,11 @@ public class GameManager : MonoBehaviour
             currentCreature.JumpAway();
             newCreature.Die();
             yield return new WaitForSeconds(1.5f);
+            FightManager.DestroyHealthBars();
             yield return ShowVictoryOrDefeat(false);
             Destroy(currentCreature.gameObject);
             currentCreature = CreatureCreator.CreateDummyCreature();
+            currentCreature.gameObject.SetActive(false);
             streak = 0;
         }
         else
@@ -127,6 +129,7 @@ public class GameManager : MonoBehaviour
             currentCreature.Die();
             newCreature.JumpAway();
             yield return new WaitForSeconds(1.5f);
+            FightManager.DestroyHealthBars();
             yield return ShowVictoryOrDefeat(true);
             currentCreature = newCreature;
             currentCreature.CurrentHealth = currentCreature.Health;
@@ -136,7 +139,6 @@ public class GameManager : MonoBehaviour
             Destroy(provisionalBattlefield);
             provisionalBattlefield = null;
         }
-        FightManager.DestroyHealthBars();
         state = GameState.Picking;
     }
 
@@ -236,7 +238,7 @@ public class GameManager : MonoBehaviour
                     particles.GetComponent<ParticleSystem>().Stop();
                     Destroy(particles, 5);
 
-                    yield return new WaitForSeconds(2f);
+                    yield return new WaitForSeconds(1f);
 
                     yield return CreatureShowcase(classification.Prediction);
                 }
