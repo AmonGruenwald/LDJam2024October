@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,7 +13,7 @@ public class Leg : MonoBehaviour
     private LineRenderer lineRenderer;
     private float randomOffset;
     private Vector3 basePosition;
-
+    private bool shrinking = false;
     void Start()
     {
         lineRenderer = this.GetComponent<LineRenderer>();
@@ -23,6 +24,10 @@ public class Leg : MonoBehaviour
 
     public void StartFootTween()
     {
+        if (shrinking)
+        {
+            return;
+        }
         float randomRightFactor = UnityEngine.Random.Range(-1.0f, 1.0f);
         float randomForwardFactor = UnityEngine.Random.Range(-1.0f, 1.0f);
         float scale = 0.2f;
@@ -41,9 +46,28 @@ public class Leg : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 footDifference = Foot.localPosition - basePosition;
-        Vector3 kneeOffset = new Vector3(0, Mathf.Sin(Time.time * 7 + randomOffset) * 0.05f, Mathf.Sin(Time.time * 5 + randomOffset) * 0.01f);
-        Vector3[] position = new Vector3[] { Base.localPosition, Knee.localPosition + kneeOffset + footDifference *0.25f, Foot.localPosition };
-        lineRenderer.SetPositions(position);
+        if (!shrinking)
+        {
+
+            Vector3 footDifference = Foot.localPosition - basePosition;
+            Vector3 kneeOffset = new Vector3(0, Mathf.Sin(Time.time * 7 + randomOffset) * 0.05f, Mathf.Sin(Time.time * 5 + randomOffset) * 0.01f);
+            Vector3[] position = new Vector3[] { Base.localPosition, Knee.localPosition + kneeOffset + footDifference * 0.25f, Foot.localPosition };
+            lineRenderer.SetPositions(position);
+        }
+        else
+        {
+            Vector3[] position = new Vector3[] { Base.localPosition, Knee.localPosition, Foot.localPosition };
+            lineRenderer.SetPositions(position);
+        }
+    }
+
+    public void Shrink()
+    {
+        shrinking = true;
+        Vector3 goal = Base.localPosition;
+        goal.y = -1;
+        Base.DOLocalMove(goal, 0.95f);
+        Knee.DOLocalMove(goal, 0.95f);
+        Foot.DOLocalMove(goal, 0.95f);
     }
 }

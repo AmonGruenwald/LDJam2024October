@@ -1,7 +1,6 @@
 ﻿using DG.Tweening;
 using System;
 using System.Collections;
-using Unity.Android.Gradle;
 using UnityEngine;
 
 public enum Element
@@ -17,6 +16,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     public float Strength;
     public float Evasion;
     public int id;
+    public Transform Body;
 
     public Element Element;
     private Renderer _renderer;
@@ -28,7 +28,9 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     public bool AttackRunning = false;
 
     public float CurrentHealth;
+    private float randomBodyOffset;
 
+    public Vector3 BodyBasePosition;
 
     private Color GetColorForElement(Element element)
     {
@@ -58,6 +60,8 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         _animator = GetComponentInChildren<Animator>();
         ParticleSystem = GetComponentInChildren<ParticleSystem>();
         Legs = GetComponentsInChildren<Leg>();
+        randomBodyOffset = UnityEngine.Random.Range(0.0f, 180.0f);
+        BodyBasePosition = Body.localPosition;
     }
 
     public Creature SetId(int id)
@@ -83,11 +87,17 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
 
 
         var colorKeys = new GradientColorKey[2];
-        colorKeys[0] = new GradientColorKey(GetColorForElement(Element.Wood), 0);
+        colorKeys[0] = new GradientColorKey(GetColorForElement(element), 0);
         colorKeys[1] = new GradientColorKey(new Color(1, 1, 1), 1);
         ParticleSystem.colorOverLifetime.color.gradient.colorKeys = colorKeys;
 
         return this;
+    }
+
+    private void Update()
+    {
+        Vector3 bodyOffset = new Vector3(0, Mathf.Sin(Time.time * 7 + randomBodyOffset) * 0.05f, Mathf.Sin(Time.time * 5 + randomBodyOffset) * 0.01f);
+        Body.localPosition = BodyBasePosition + bodyOffset;
     }
     public Creature SetStats(CreatureDescription description)
     {
@@ -160,6 +170,8 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
             // Add randomness to the base damage (±10%)
             float baseDamage = this.Strength * (1 - damageReduction);
             float randomDamage = baseDamage * (UnityEngine.Random.Range(0.0f, 1.0f) * 0.2f - 0.1f);
+            float elementMultiplier = GetElementDamageMultiplier(this.Element, other.Element);
+            float elementalDamage = randomDamage * elementMultiplier;
             float finalDamage = Mathf.Max(1.0f, randomDamage);
             yield return other.Damage(finalDamage);
 
@@ -172,6 +184,64 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
 
 
         AttackRunning = false;
+    }
+
+    private float GetElementDamageMultiplier(Element Attacker, Element Defender)
+    {
+        switch (Attacker)
+        {
+            case Element.Wood:
+                if (Defender == Element.Fire)
+                {
+                    return 0.75f;
+                }
+                if (Defender == Element.Earth)
+                {
+                    return 1.25f;
+                }
+                break;
+            case Element.Fire:
+                if (Defender == Element.Earth)
+                {
+                    return 0.75f;
+                }
+                if (Defender == Element.Metal)
+                {
+                    return 1.25f;
+                }
+                break;
+            case Element.Earth:
+                if (Defender == Element.Metal)
+                {
+                    return 0.75f;
+                }
+                if (Defender == Element.Water)
+                {
+                    return 1.25f;
+                }
+                break;
+            case Element.Metal:
+                if (Defender == Element.Water)
+                {
+                    return 0.75f;
+                }
+                if (Defender == Element.Wood)
+                {
+                    return 1.25f;
+                }
+                break;
+            case Element.Water:
+                if (Defender == Element.Wood)
+                {
+                    return 0.75f;
+                }
+                if (Defender == Element.Fire)
+                {
+                    return 1.25f;
+                }
+                break;
+        }
+        return 1.0f;
     }
 
     private void Dodged(float duration)
@@ -264,5 +334,19 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         }
 
         return stat;
+    }
+
+    public void Die()
+    {
+        this.Legs[0].Shrink();
+        this.Legs[1].Shrink();
+        _animator.SetTrigger("Died");
+        StartCoroutine(DelayedDestroy());
+    }
+
+    private IEnumerator DelayedDestroy()
+    {
+        yield return new WaitForSeconds(0.95f);
+        Destroy(this.gameObject);
     }
 }

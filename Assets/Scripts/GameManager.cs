@@ -109,13 +109,14 @@ public class GameManager : MonoBehaviour
 
         if (winner.Equals(currentCreature))
         {
+            currentCreature.Die();
+            newCreature.Die();
+            yield return new WaitForSeconds(1.5f);
             yield return ShowVictoryOrDefeat(false);
-
-            Destroy(currentCreature.gameObject);
-            Destroy(newCreature.gameObject);
+            currentCreature.transform.SetParent(null);
+            newCreature.transform.SetParent(null);
             currentCreature = CreatureCreator.CreateDummyCreature();
-            Debug.Log("U lost");
-
+            currentCreature.gameObject.SetActive(false);
             streak = 0;
         }
         else
@@ -125,13 +126,12 @@ public class GameManager : MonoBehaviour
                 maxStreak = streak;
                 PlayerPrefs.SetInt("hiscore", streak);
             }
-            Debug.Log("Game continues");
-
+            currentCreature.Die();
+            yield return new WaitForSeconds(1.5f);
             yield return ShowVictoryOrDefeat(true);
-
-            Destroy(currentCreature.gameObject);
             currentCreature = newCreature;
             currentCreature.CurrentHealth = currentCreature.Health;
+            currentCreature.gameObject.SetActive(false);
         }
 
         if (provisionalBattlefield != null) {
@@ -139,7 +139,6 @@ public class GameManager : MonoBehaviour
             provisionalBattlefield = null;
         }
         FightManager.DestroyHealthBars();
-
         state = GameState.Picking;
     }
 
@@ -324,9 +323,12 @@ public class GameManager : MonoBehaviour
 
             state = GameState.Fighting;
             StartCoroutine(FightManager.StartFight(currentCreature, newCreature, plane.transform));
-        } else {
+        } else
+        {
+            newCreature.ParticleSystem.Clear();
+            newCreature.ParticleSystem.Stop();
             state = GameState.Picking;
-            Destroy(newCreature.gameObject);
+            newCreature.Die();
         }
 
         yield return new WaitForSeconds(1.0f);
