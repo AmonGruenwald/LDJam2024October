@@ -72,6 +72,8 @@ public class FightManager : MonoBehaviour
         var targetPosA = FightSpot.position + FightSpot.right * Distance * 0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
         a.transform.position = targetPosA;
 
+        b.AttackAnimation();
+
         var targetPosB = FightSpot.position + FightSpot.right * Distance * -0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
         yield return b.transform.DOMove(targetPosB, 1f).WaitForCompletion();
         this.a = a;

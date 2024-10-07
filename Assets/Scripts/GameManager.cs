@@ -109,14 +109,12 @@ public class GameManager : MonoBehaviour
 
         if (winner.Equals(currentCreature))
         {
-            currentCreature.Die();
+            currentCreature.JumpAway();
             newCreature.Die();
             yield return new WaitForSeconds(1.5f);
             yield return ShowVictoryOrDefeat(false);
-            currentCreature.transform.SetParent(null);
-            newCreature.transform.SetParent(null);
+            Destroy(currentCreature.gameObject);
             currentCreature = CreatureCreator.CreateDummyCreature();
-            currentCreature.gameObject.SetActive(false);
             streak = 0;
         }
         else
@@ -127,11 +125,11 @@ public class GameManager : MonoBehaviour
                 PlayerPrefs.SetInt("hiscore", streak);
             }
             currentCreature.Die();
+            newCreature.JumpAway();
             yield return new WaitForSeconds(1.5f);
             yield return ShowVictoryOrDefeat(true);
             currentCreature = newCreature;
             currentCreature.CurrentHealth = currentCreature.Health;
-            currentCreature.gameObject.SetActive(false);
         }
 
         if (provisionalBattlefield != null) {
@@ -282,6 +280,7 @@ public class GameManager : MonoBehaviour
         newCreature.transform.SetParent(creatureShowcasePoint, true);
 
         newCreature.transform.DOLocalRotateQuaternion(Quaternion.identity, duration).SetEase(Ease.InFlash).SetEase(Ease.OutBounce);
+        newCreature.AttackAnimation();
         yield return newCreature.transform.DOLocalMove(Vector3.zero, duration).SetEase(Ease.InFlash).SetEase(Ease.OutBounce).WaitForCompletion();
 
         newCreature.transform.position = creatureShowcasePoint.transform.position;
@@ -337,7 +336,7 @@ public class GameManager : MonoBehaviour
 
     private GameObject GetNearestFittingPlane() {
         var planes = FindObjectsByType<ARPlane>(FindObjectsSortMode.None)
-            .Where((plane) => (plane.size.x * plane.size.y) > _minPlaneSize && plane.alignment.IsHorizontal())
+            .Where((plane) => (plane.size.x * plane.size.y) > _minPlaneSize && plane.alignment.IsHorizontal() && IsInFront(plane.transform))
             .ToArray();
 
         if (planes.Length == 0) {
@@ -355,6 +354,13 @@ public class GameManager : MonoBehaviour
         }
 
         return nearestPlane.gameObject;
+    }
+
+    bool IsInFront(Transform obj)
+    {
+        Vector3 toObject = (obj.position - Camera.main.transform.position).normalized;
+        float dotProduct = Vector3.Dot(Camera.main.transform.forward, toObject);
+        return dotProduct > 0;
     }
 
     private GameObject CreateProvisionalBattlefield(Vector3 position) {

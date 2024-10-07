@@ -31,9 +31,9 @@ public class CreatureCreator : MonoBehaviour
         Creature creatureComponent = instantiatedObject.GetComponent<Creature>();
         creatureComponent
             .SetId(idCounter++)
-            .SetStats(1, 3, 1, 1, 1, Element.Wood)
+            .SetStats(1, 3, 1, 1, 1, Element.Metal)
             .SetImage(DummyImage);
-        creatureComponent.Name = "Fighting Dummy";
+        creatureComponent.Name = "Compile & Conquer";
         return creatureComponent;
     }
 

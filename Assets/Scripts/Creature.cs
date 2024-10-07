@@ -17,6 +17,8 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     public float Evasion;
     public int id;
     public Transform Body;
+    public ParticleSystem AttackParticles;
+    public GameObject DodgedPrefab;
 
     public Element Element;
     private Renderer _renderer;
@@ -153,11 +155,15 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         {
             other.Dodged(attackDuration);
         }
+
         // Perform the jump animation
         yield return this.transform.DOPath(path, attackDuration, PathType.CatmullRom)
             .SetEase(Ease.OutQuad)
             .SetDelay(0.05f)
             .WaitForCompletion();
+        if (!doesDodge) {
+            other.AttackParticles.Play();
+        }
         this.transform.DOMove(originalPosition, 0.3f)
             .SetEase(Ease.InQuad)
             .WaitForCompletion();
@@ -172,7 +178,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
             float randomDamage = baseDamage * (UnityEngine.Random.Range(0.0f, 1.0f) * 0.2f - 0.1f);
             float elementMultiplier = GetElementDamageMultiplier(this.Element, other.Element);
             float elementalDamage = randomDamage * elementMultiplier;
-            float finalDamage = Mathf.Max(1.0f, randomDamage);
+            float finalDamage = Mathf.Max(1.0f, elementalDamage);
             yield return other.Damage(finalDamage);
 
             Debug.Log($"Creature #{id} dealt {finalDamage} damage to creature #{other.id}. Health afterwards: {other.Health}");
@@ -251,15 +257,14 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         Vector3[] path = new Vector3[] { originalPosition, targetPoint, originalPosition };
         this.gameObject.transform.DOPath(path, duration * 2);
         Quaternion startRotation = this.gameObject.transform.rotation;
+
+        var go = Instantiate(DodgedPrefab, transform.position, Quaternion.identity);
+        Destroy(go, 3f);
+
         this.gameObject.transform.DORotateQuaternion(startRotation * Quaternion.Euler(0, 90 * (UnityEngine.Random.Range(0.0f, 10.0f) < 5.0f ? 1 : -1), 0), duration);
         this.gameObject.transform.DORotateQuaternion(startRotation, duration)
             .SetDelay(duration * 0.5f);
     }
-
-    public void PerformAttackAnimation(Transform target)
-    {
-    }
-
 
     private IEnumerator Damage(float finalDamage)
     {
@@ -336,6 +341,23 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         return stat;
     }
 
+    public void JumpAway() {
+       StartCoroutine(DoJumpAway());
+    }
+
+    public void AttackAnimation() {
+        _animator.SetTrigger("Attack"); 
+    }
+
+    public IEnumerator DoJumpAway() {
+        _animator.SetTrigger("Attack");
+        transform.DOMoveY(transform.position.y - 0.2f, 0.4f);
+        yield return new WaitForSeconds(0.4f);
+        transform.DOMoveY(transform.position.y + 5f, 1f);
+        yield return new WaitForSeconds(0.95f);
+        gameObject.SetActive(false);
+    }
+
     public void Die()
     {
         this.Legs[0].Shrink();
@@ -347,6 +369,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     private IEnumerator DelayedDestroy()
     {
         yield return new WaitForSeconds(0.95f);
+        yield return transform.DOScale(0.0f, 1f);
         Destroy(this.gameObject);
     }
 }
