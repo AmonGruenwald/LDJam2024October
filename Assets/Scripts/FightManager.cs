@@ -61,6 +61,11 @@ public class FightManager : MonoBehaviour
         yield return b.transform.DOMove(targetPosB, 1f).WaitForCompletion();
         this.a = a;
         this.b = b;
+        for (int i = 0; i < a.Legs.Length; i++)
+        {
+            a.Legs[i].StartFootTween();
+            b.Legs[i].StartFootTween();
+        }
         FightRunning = true;
     }
     private void completeFight(Creature winner)

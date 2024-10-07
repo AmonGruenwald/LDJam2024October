@@ -6,4 +6,5 @@
     public float strength;
     public float evasion;
     public float defense;
+    public Element element;
 }

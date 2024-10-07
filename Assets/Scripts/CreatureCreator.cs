@@ -32,7 +32,7 @@ public class CreatureCreator : MonoBehaviour
         Creature creatureComponent = instantiatedObject.GetComponent<Creature>();
         creatureComponent
             .SetId(idCounter++)
-            .SetStats(1, 3, 1, 1, 1) // TODO figure default stats
+            .SetStats(1, 3, 1, 1, 1, Element.Wood)
             .SetImage(DummyImage);
         return creatureComponent;
     }
@@ -56,14 +56,39 @@ public class CreatureCreator : MonoBehaviour
         var template = statTemplates[prediction.categoryIndex];
         var nameIndex = UnityEngine.Random.Range(0, template.name.Length);
 
-        return new CreatureDescription {
+        return new CreatureDescription
+        {
             name = template.name[nameIndex],
             speed = template.stats.RandomSpeed(),
             health = template.stats.RandomHealth(),
             strength = template.stats.RandomStrength(),
             evasion = template.stats.RandomEvasion(),
             defense = template.stats.RandomDefense(),
+            element = StringToElement(template.element)
         };
+    }
+
+    private Element StringToElement(string element)
+    {
+        switch (element)
+        {
+            case "Water":
+                return Element.Water;
+                break;
+            case "Metal":
+                return Element.Metal;
+                break;
+            case "Earth":
+                return Element.Earth;
+                break;
+            case "Fire":
+                return Element.Fire;
+                break;
+            case "Wood":
+                return Element.Wood;
+                break;
+        }
+        return Element.Wood;
     }
 }
 
@@ -86,6 +111,7 @@ public class SerializedCreatureDataStats {
     public float[] strength;
     public float[] evasion;
     public float[] defense;
+
 
     public float RandomSpeed() => UnityEngine.Random.Range(speed[0], speed[1]);
     public float RandomHealth() => UnityEngine.Random.Range(health[0], health[1]);

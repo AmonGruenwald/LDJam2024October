@@ -172,7 +172,7 @@ public class GameManager : MonoBehaviour
 
         newCreature.transform.position = creatureShowcasePoint.transform.position;
         newCreature.transform.rotation = creatureShowcasePoint.transform.rotation;
-
+        newCreature.ParticleSystem.Play();
         
         bool keep = false;
         bool discard = false;
@@ -191,7 +191,10 @@ public class GameManager : MonoBehaviour
 
         if (keep) {
             currentCreature.gameObject.SetActive(true);
+            newCreature.ParticleSystem.Clear();
+            newCreature.ParticleSystem.Stop();
             var plane = GetNearestFittingPlane();
+            plane = null;
             if (plane == null) {
                 var position = Camera.main.transform.position + Camera.main.transform.forward * 1.2f;
                 provisionalBattlefield = CreateProvisionalBattlefield(position);

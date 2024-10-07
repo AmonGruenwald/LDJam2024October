@@ -454,7 +454,7 @@
       "Zephyrwing Harrier",
       "Solstice Glider"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         13,
@@ -550,7 +550,7 @@
       "Morningark Thespian",
       "Firelight Skydancer"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         6.5,
@@ -598,7 +598,7 @@
       "Vermilion Skyflier",
       "Phoenix Plumefin"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         8,
@@ -646,7 +646,7 @@
       "Cryosky Warden",
       "Frostveil Wanderer"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         6.5,
@@ -694,7 +694,7 @@
       "Ecliptic Skylark",
       "Starbound Harmony"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         14,
@@ -742,7 +742,7 @@
       "Thundercall Skylark",
       "Mystic Galeheart"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         12,
@@ -790,7 +790,7 @@
       "Liltwing Harpist",
       "Sunshadow Canticle"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         7,
@@ -838,7 +838,7 @@
       "Aurora Gleambringer",
       "Sunlit Crestfalcon"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         15,
@@ -886,7 +886,7 @@
       "Aether Songbird",
       "Glimmerwing Harbinger"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         7,
@@ -934,7 +934,7 @@
       "Breeze Lightcall",
       "Cloudsong Wisp"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         7,
@@ -1030,7 +1030,7 @@
       "Stormcrest Chaser",
       "Heaven's Artisan"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         6,
@@ -1078,7 +1078,7 @@
       "Sunchaser Patriarch",
       "Ravenstorm Envoy"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         12,
@@ -1126,7 +1126,7 @@
       "Talon of Doom",
       "Empyrean Wingedbane"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         12,
@@ -1174,7 +1174,7 @@
       "Verdant Protector",
       "Skyshroud Oracle"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         6,
@@ -1318,7 +1318,7 @@
       "Somber Nocturne",
       "Chiaroscuro Apparition"
     ],
-    "element": "Shadow",
+    "element": "Fire",
     "stats": {
       "speed": [
         7,
@@ -1990,7 +1990,7 @@
       "Skyroar's Thread",
       "Windshard Quiver"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         14,
@@ -3766,7 +3766,7 @@
       "Breeze-touched Pulse",
       "Temporal Riftflitter"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         15,
@@ -3862,7 +3862,7 @@
       "Stormshadow Harrier",
       "Enigma of the Wilder"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         7,
@@ -4054,7 +4054,7 @@
       "Majesty Plumemyth",
       "Grace Thunderstream"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         4.5,
@@ -4102,7 +4102,7 @@
       "Spectral Twilightsong",
       "Etherial Arcquiver"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         6,
@@ -4150,7 +4150,7 @@
       "Chimewind Wanderer",
       "Silversong Haven"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         5.5,
@@ -4198,7 +4198,7 @@
       "Horizon Glider",
       "Thunderplume Oracle"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         6,
@@ -4246,7 +4246,7 @@
       "Glimmershade Plume",
       "Nova Featherstorm"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         13,
@@ -4294,7 +4294,7 @@
       "Skyfire Radiant",
       "Stormwing Sage"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         7,
@@ -4342,7 +4342,7 @@
       "Chroma Aerialis",
       "Nimbus Serenade"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         13,
@@ -4390,7 +4390,7 @@
       "Embergrove Keeper",
       "Riftglade Prognosticator"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         6,
@@ -4438,7 +4438,7 @@
       "Dawnseeker Paeon",
       "Cloudweaver Kestrel"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         9,
@@ -4486,7 +4486,7 @@
       "Glider of the Eternal Breeze",
       "Songbird of Ancestral Winds"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         8,
@@ -4534,7 +4534,7 @@
       "Windrider Gleam",
       "Harmonious Skydancer"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         16,
@@ -4582,7 +4582,7 @@
       "Nimbus Breathsong",
       "Haloed Songweaver"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         8,
@@ -6118,7 +6118,7 @@
       "Luminara Beakon",
       "Nimbus Glider"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         12,
@@ -6166,7 +6166,7 @@
       "Moon's Veil Avenger",
       "Celestial Nightprowler"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         7,
@@ -6214,7 +6214,7 @@
       "Mystic Cloudstrider",
       "Solstice Plumedancer"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         8,
@@ -6454,7 +6454,7 @@
       "Jetstream Monarch",
       "Highwing Voyager"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         8,
@@ -6646,7 +6646,7 @@
       "Airborne Nomad",
       "Mistral Guardian"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         8,
@@ -6742,7 +6742,7 @@
       "Flarecrest Wander",
       "Solar Plumejourner"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         8,
@@ -7030,7 +7030,7 @@
       "Vigilant Moonwind",
       "Eclipsing Wingbearer"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         14,
@@ -7558,7 +7558,7 @@
       "Aurora Winkleap",
       "Twilight Windwhisper"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         8,
@@ -7702,7 +7702,7 @@
       "Celestial Glider",
       "Aurora's Pride"
     ],
-    "element": "Wind",
+    "element": "Earth",
     "stats": {
       "speed": [
         12,
@@ -8134,7 +8134,7 @@
       "Azure Skyward Beast",
       "Effervescent Soulhound"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         8,
@@ -8230,7 +8230,7 @@
       "Insightful Gale",
       "Aether's Swift"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         10,
@@ -8278,7 +8278,7 @@
       "Starwhisper Gale",
       "Featherwisp Chase"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         18,
@@ -8470,7 +8470,7 @@
       "Sunspirit Blazer",
       "Starseeker's Fable"
     ],
-    "element": "Wind",
+    "element": "Fire",
     "stats": {
       "speed": [
         17,
@@ -8566,7 +8566,7 @@
       "Boreal Pathfinder",
       "Celestial Huntguardian"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         8,
@@ -8806,7 +8806,7 @@
       "Wispborne Watcher",
       "Foglit Breezehound"
     ],
-    "element": "Wind",
+    "element": "Earth",
     "stats": {
       "speed": [
         6,
@@ -12598,7 +12598,7 @@
       "Solarflare Breeze",
       "Nightshade Skymaster"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         5,
@@ -13654,7 +13654,7 @@
       "Prowler of Secrets",
       "Velvet Nightstalker"
     ],
-    "element": "Shadow",
+    "element": "Metal",
     "stats": {
       "speed": [
         5.5,
@@ -14806,7 +14806,7 @@
       "Celestia Streamglide",
       "Harbinger of Zephyrs"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         12,
@@ -14854,7 +14854,7 @@
       "Aurora Flightcaller",
       "Blossom Swiftwhisper"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         10,
@@ -15190,7 +15190,7 @@
       "Gossamer Balladeer",
       "Echo of the Ancients"
     ],
-    "element": "Wind",
+    "element": "Wood",
     "stats": {
       "speed": [
         14,
@@ -15286,7 +15286,7 @@
       "Shadowglide Faemuse",
       "Flurry Wispshadow"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         8.5,
@@ -15334,7 +15334,7 @@
       "Stormbound Sunshard",
       "Verdant Whisperwind"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         15,
@@ -15382,7 +15382,7 @@
       "Windstrider Pixie",
       "Aurora Flickerflight"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         14,
@@ -15574,7 +15574,7 @@
       "Pollenveil Dancer",
       "Zephyr's Emissary"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         4,
@@ -15670,7 +15670,7 @@
       "Whisked Petalbloom",
       "Elysian Windweaver"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         15,
@@ -18981,7 +18981,7 @@
       "Eclipsing Wing",
       "Radiant Windtreader"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         15,
@@ -19413,7 +19413,7 @@
       "Cyclone Majestic",
       "Mistral Juggernaut"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         12,
@@ -19461,7 +19461,7 @@
       "Heavenly Gale",
       "Nimbus Paradox"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         7,
@@ -20037,7 +20037,7 @@
       "Aerial Veil",
       "Sirocco Dancer"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         2,
@@ -20661,7 +20661,7 @@
       "Sunfire Glimmer Ball",
       "Mirage Pulse Sphere"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         8.5,
@@ -21333,7 +21333,7 @@
       "Aurora Tandem Trailblazer",
       "Vortex Coupling Runner"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         6,
@@ -21717,7 +21717,7 @@
       "Nebula Crown",
       "Tempest Veil"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         1,
@@ -22197,7 +22197,7 @@
       "Skyward Custodian",
       "Aeolian Sage"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         3.5,
@@ -22869,7 +22869,7 @@
       "Harmony Revolve",
       "Gleam Twirler"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         3,
@@ -23724,7 +23724,7 @@
       "Duskwind Lyric",
       "Verdant Chimesinger"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         1.5,
@@ -24060,7 +24060,7 @@
       "Ephemeral Serenade",
       "Obsidian Shadowguard"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         3,
@@ -24828,7 +24828,7 @@
       "Breeze's Emissary",
       "Cyclone Eyrie"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         12,
@@ -26172,7 +26172,7 @@
       "Nimbus Gustcharm",
       "Air Elemental Flowcrafter"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         12,
@@ -26364,7 +26364,7 @@
       "Silvershade Missive",
       "Elderglimmer Envoy"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         3,
@@ -26508,7 +26508,7 @@
       "Dawnmist Featherchain",
       "Seraph's Feathernest"
     ],
-    "element": "Wind",
+    "element": "Wood",
     "stats": {
       "speed": [
         1.5,
@@ -26796,7 +26796,7 @@
       "Odin's Windcaller",
       "Phoenix's Song"
     ],
-    "element": "Wind",
+    "element": "Wood",
     "stats": {
       "speed": [
         3,
@@ -27372,7 +27372,7 @@
       "Aetherbind Visage",
       "Wraith Cloak"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         2,
@@ -28092,7 +28092,7 @@
       "Faeglow Mist",
       "Cloudweaver's Charm"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         1,
@@ -28284,7 +28284,7 @@
       "Blitz Zephyr",
       "Puffwind Enchanter"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         8,
@@ -28380,7 +28380,7 @@
       "Whimspinner Draught",
       "Ephemeral Driftguard"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         3,
@@ -28476,7 +28476,7 @@
       "Banshee's Whisper",
       "Mistral's Accord"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         7,
@@ -28860,7 +28860,7 @@
       "Seraph's Arcane Hem",
       "Dawn's Ethereal Whirl"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         1.5,
@@ -30156,7 +30156,7 @@
       "Silverstroke Tracer",
       "Astral Drafter"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         1,
@@ -30348,7 +30348,7 @@
       "Howl Crafter",
       "Blare Archmage"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         4,
@@ -31212,7 +31212,7 @@
       "Acoustic Vortex",
       "Conductor's Empyrean"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         3,
@@ -31452,7 +31452,7 @@
       "Tempest Gleam",
       "Enchanted Twilight Swirl"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         5,
@@ -32172,7 +32172,7 @@
       "Aurorablade Zephyr",
       "Windshard Roamer"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         12,
@@ -32460,7 +32460,7 @@
       "Whirlwind's Echo",
       "Abyssal Zephyr"
     ],
-    "element": "Wind",
+    "element": "Wood",
     "stats": {
       "speed": [
         8,
@@ -32844,7 +32844,7 @@
       "Harmonious Zephyra",
       "Aeolian Lyrist"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         3,
@@ -33180,7 +33180,7 @@
       "Skycloak Respiras",
       "Zephyr's Protection"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         1.5,
@@ -33228,7 +33228,7 @@
       "Celestial Binder",
       "Abyssal Messenger"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         5,
@@ -33660,7 +33660,7 @@
       "Aeolian Surfer",
       "Avalon's Escape"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         6,
@@ -34668,7 +34668,7 @@
       "Chandelier’s Gift",
       "Moonlit Halo Sphere"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         3.5,
@@ -34716,7 +34716,7 @@
       "Lightweaver Astralspin",
       "Cyclone Dancechord"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         12,
@@ -34860,7 +34860,7 @@
       "Skyward Sentinel",
       "Avalon Skyblade"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         15,
@@ -34956,7 +34956,7 @@
       "Evanescent Sheencloak",
       "Skysong Glider"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         1,
@@ -35820,7 +35820,7 @@
       "Starlight Reveler",
       "Elusive Dreamcatcher"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         14,
@@ -36972,7 +36972,7 @@
       "Aeroflight Sentinel",
       "Cyclone Arc"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         14,
@@ -38364,7 +38364,7 @@
       "Dreamshroud Portal",
       "Veiled Passage"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         6,
@@ -38652,7 +38652,7 @@
       "Guardian of the Play",
       "Flickerstorm Globe"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         15,
@@ -39564,7 +39564,7 @@
       "Umbral Vesture",
       "Ebonmire Embrace"
     ],
-    "element": "Shadow",
+    "element": "Earth",
     "stats": {
       "speed": [
         3.5,
@@ -40908,7 +40908,7 @@
       "Rolling Zephyr",
       "Aeroflight Talisman"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         12,
@@ -42252,7 +42252,7 @@
       "Runic Revolvers",
       "Alchemist's Axle"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         5.5,
@@ -42348,7 +42348,7 @@
       "Windcarver Entity",
       "Galechaser Phantom"
     ],
-    "element": "Air",
+    "element": "Fire",
     "stats": {
       "speed": [
         7,
@@ -42732,7 +42732,7 @@
       "Stormweaver's Sphere",
       "Gleaming Cloudshaper"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         12,
@@ -43308,7 +43308,7 @@
       "Lament of the Zephyr",
       "Windspirit Conductor"
     ],
-    "element": "Air",
+    "element": "Metal",
     "stats": {
       "speed": [
         5,
@@ -43404,7 +43404,7 @@
       "Celestial Loom",
       "Ether Curtain"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         4,
@@ -43500,7 +43500,7 @@
       "Soulthread Charm",
       "Horizon Ifold"
     ],
-    "element": "Air",
+    "element": "Wood",
     "stats": {
       "speed": [
         1.5,
@@ -43596,7 +43596,7 @@
       "Skyrealm's Guardian",
       "Flarewing's Haven"
     ],
-    "element": "Air",
+    "element": "Water",
     "stats": {
       "speed": [
         15,
@@ -46572,7 +46572,7 @@
       "Twilight Tideshift",
       "Aetherial Winglord"
     ],
-    "element": "Air",
+    "element": "Earth",
     "stats": {
       "speed": [
         14,

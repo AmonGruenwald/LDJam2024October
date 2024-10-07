@@ -1,8 +1,13 @@
 ﻿using DG.Tweening;
 using System;
 using System.Collections;
+using Unity.Android.Gradle;
 using UnityEngine;
 
+public enum Element
+{
+    Water, Metal, Earth, Fire, Wood
+}
 public class Creature : MonoBehaviour, IEquatable<Creature>
 {
     public string Name;
@@ -13,15 +18,46 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     public float Evasion;
     public int id;
 
+    public Element Element;
     private Renderer _renderer;
+    private Animator _animator;
+    public ParticleSystem ParticleSystem;
+    public Leg[] Legs;
     private float currentAttackDeadline = 1.0f;
 
     public bool AttackRunning = false;
 
     public float CurrentHealth;
 
+
+    private Color GetColorForElement(Element element)
+    {
+        switch (element)
+        {
+            case Element.Water:
+                return new Color(0.0f / 255.0f, 255.0f / 255.0f, 246.0f / 255.0f);
+                break;
+            case Element.Earth:
+                return new Color(203.0f / 255.0f, 111.0f / 255.0f, 0.0f / 255.0f);
+                break;
+            case Element.Fire:
+                return new Color(255.0f / 255.0f, 9.0f / 255.0f, 0.0f / 255.0f);
+                break;
+            case Element.Wood:
+                return new Color(34.0f / 255.0f, 255.0f / 255.0f, 0.0f / 255.0f);
+                break;
+            case Element.Metal:
+                return new Color(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f);
+                break;
+        }
+        return Color.white;
+    }
+
     private void Awake() {
         _renderer = GetComponentInChildren<Renderer>();
+        _animator = GetComponentInChildren<Animator>();
+        ParticleSystem = GetComponentInChildren<ParticleSystem>();
+        Legs = GetComponentsInChildren<Leg>();
     }
 
     public Creature SetId(int id)
@@ -33,30 +69,29 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         float speed,
         float health,
         float defense, 
-        float attack,
-        float evasion)
+        float strength,
+        float evasion,
+        Element element)
     {
         this.Speed = speed;
         this.Health = health;
         this.CurrentHealth = this.Health;
         this.Defense = defense;
-        this.Strength = attack;
+        this.Strength = strength;
         this.Evasion = evasion;
+        this.Element = element;
+
+
+        var colorKeys = new GradientColorKey[2];
+        colorKeys[0] = new GradientColorKey(GetColorForElement(Element.Wood), 0);
+        colorKeys[1] = new GradientColorKey(new Color(1, 1, 1), 1);
+        ParticleSystem.colorOverLifetime.color.gradient.colorKeys = colorKeys;
 
         return this;
     }
     public Creature SetStats(CreatureDescription description)
     {
-        this.name = description.name;
-
-        //TODO: elemental
-        this.Speed = description.speed;
-        this.Health = description.health;
-        this.CurrentHealth = this.Health;
-        this.Defense = description.defense;
-        this.Strength = description.strength;
-        this.Evasion = description.evasion;
-        return this;
+        return SetStats(description.speed, description.health, description.defense, description.strength, description.evasion, description.element);
     }
 
     public Creature SetImage(Texture2D image)
@@ -90,23 +125,32 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     private IEnumerator AttackCoroutine(Creature other)
     {
         AttackRunning = true;
-
+        _animator.SetTrigger("Attacking");
+        yield return new WaitForSeconds(0.2f);
         // Calculate the middle point between the attacker and the target
-        Vector3 middlePoint = (transform.position + other.gameObject.transform.position) / 2f;
-        middlePoint.y += 1; // Add height for the arc
-
         Vector3 originalPosition = this.transform.position;
-        // Create a path for the jump animation
-        Vector3[] path = new Vector3[] { originalPosition, middlePoint, other.transform.position };
+        Vector3 targetPoint = (originalPosition + (other.gameObject.transform.position - originalPosition) * 0.75f);
+        Vector3 middlePoint = (originalPosition + targetPoint) / 2f;
+        middlePoint.y += 0.8f; // Add height for the arc
 
+        // Create a path for the jump animation
+        Vector3[] path = new Vector3[] { originalPosition, middlePoint, targetPoint };
+
+        bool doesDodge = other.TryDodge();
+        float attackDuration = 0.5f;
+        if (doesDodge)
+        {
+            other.Dodged(attackDuration);
+        }
         // Perform the jump animation
-        yield return this.transform.DOPath(path, 0.5f, PathType.CatmullRom)
+        yield return this.transform.DOPath(path, attackDuration, PathType.CatmullRom)
             .SetEase(Ease.OutQuad)
+            .SetDelay(0.05f)
             .WaitForCompletion();
         this.transform.DOMove(originalPosition, 0.3f)
             .SetEase(Ease.InQuad)
             .WaitForCompletion();
-        if (!other.TryDodge())
+        if (!doesDodge)
         {
             float baseDamageReduction = other.Defense * 5.0f / 100;
             // Add some randomness to the damage reduction (±10%)
@@ -129,6 +173,18 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         AttackRunning = false;
     }
 
+    private void Dodged(float duration)
+    {
+        Vector3 originalPosition = this.transform.position;
+        Vector3 targetPoint = (originalPosition + this.gameObject.transform.right * (UnityEngine.Random.Range(0.0f, 10.0f) < 5.0f ? 1 : -1) * 0.25f);
+        Vector3[] path = new Vector3[] { originalPosition, targetPoint, originalPosition };
+        this.gameObject.transform.DOPath(path, duration * 2);
+        Quaternion startRotation = this.gameObject.transform.rotation;
+        this.gameObject.transform.DORotateQuaternion(startRotation * Quaternion.Euler(0, 90 * (UnityEngine.Random.Range(0.0f, 10.0f) < 5.0f ? 1 : -1), 0), duration);
+        this.gameObject.transform.DORotateQuaternion(startRotation, duration)
+            .SetDelay(duration * 0.5f);
+    }
+
     public void PerformAttackAnimation(Transform target)
     {
     }
@@ -137,7 +193,8 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     private IEnumerator Damage(float finalDamage)
     {
         this.CurrentHealth -= finalDamage;
-        yield return this.gameObject.transform.DOShakePosition(0.5f, 0.3f, 20, 10.0f)
+        _animator.SetTrigger("Damaged");
+        yield return this.gameObject.transform.DOShakePosition(0.5f, 0.15f, 10, 10.0f)
             .SetEase(Ease.OutElastic)
             .WaitForCompletion();
     }
