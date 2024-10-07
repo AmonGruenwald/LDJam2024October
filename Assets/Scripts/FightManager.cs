@@ -2,7 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using DG.Tweening;
-
 public class FightManager : MonoBehaviour
 {
     [SerializeField]
@@ -86,10 +85,15 @@ public class FightManager : MonoBehaviour
 
         var targetPosA = FightSpot.position + FightSpot.right * Distance * 0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
         a.transform.position = targetPosA;
+        a.transform.rotation = fightSpot.rotation;
+        a.transform.DOLocalRotateQuaternion(a.transform.localRotation * Quaternion.Euler(0, 90, 0), 1f);
 
         b.AttackAnimation();
 
         var targetPosB = FightSpot.position + FightSpot.right * Distance * -0.5f + new Vector3(0, a.gameObject.transform.localScale.y * 1.0f, 0);
+        b.transform.rotation = fightSpot.rotation;
+
+        b.transform.DOLocalRotateQuaternion(b.transform.localRotation * Quaternion.Euler(0, -90, 0), 1f);
         yield return b.transform.DOMove(targetPosB, 1f).WaitForCompletion();
         this.a = a;
         this.b = b;

@@ -19,6 +19,11 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     public Transform Body;
     public ParticleSystem AttackParticles;
     public GameObject DodgedPrefab;
+    public AudioSource AttackAudio;
+    public AudioSource[] AttackAudioVariations;
+    public AudioSource DamageAudio;
+    public AudioSource DodgeAudio;
+    public AudioSource DeathAudio;
 
     public Element Element;
     private Renderer _renderer;
@@ -138,6 +143,8 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     private IEnumerator AttackCoroutine(Creature other)
     {
         AttackRunning = true;
+        AttackAudio.Play();
+        AttackAudioVariations[UnityEngine.Random.Range(0, AttackAudioVariations.Length)].Play();
         _animator.SetTrigger("Attacking");
         yield return new WaitForSeconds(0.2f);
         // Calculate the middle point between the attacker and the target
@@ -252,6 +259,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
 
     private void Dodged(float duration)
     {
+        DodgeAudio.Play();
         Vector3 originalPosition = this.transform.position;
         Vector3 targetPoint = (originalPosition + this.gameObject.transform.right * (UnityEngine.Random.Range(0.0f, 10.0f) < 5.0f ? 1 : -1) * 0.25f);
         Vector3[] path = new Vector3[] { originalPosition, targetPoint, originalPosition };
@@ -268,6 +276,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
 
     private IEnumerator Damage(float finalDamage)
     {
+        DamageAudio.Play();
         this.CurrentHealth -= finalDamage;
         _animator.SetTrigger("Damaged");
         yield return this.gameObject.transform.DOShakePosition(0.5f, 0.15f, 10, 10.0f)
@@ -360,6 +369,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
 
     public void Die()
     {
+        DeathAudio.Play();
         this.Legs[0].Shrink();
         this.Legs[1].Shrink();
         _animator.SetTrigger("Died");

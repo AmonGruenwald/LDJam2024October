@@ -315,10 +315,14 @@ public class GameManager : MonoBehaviour
             newCreature.ParticleSystem.Clear();
             newCreature.ParticleSystem.Stop();
             var plane = GetNearestFittingPlane();
-            plane = null;
             if (plane == null) {
                 var position = Camera.main.transform.position + Camera.main.transform.forward * 1.2f;
                 provisionalBattlefield = CreateProvisionalBattlefield(position);
+                plane = provisionalBattlefield;
+            }
+            else
+            {
+                provisionalBattlefield = CreateProvisionalBattlefield(plane.transform.position);
                 plane = provisionalBattlefield;
             }
 
@@ -366,7 +370,7 @@ public class GameManager : MonoBehaviour
     }
 
     private GameObject CreateProvisionalBattlefield(Vector3 position) {
-        return Instantiate(provisionalBattlefieldPrefab, position, Quaternion.identity);
+        return Instantiate(provisionalBattlefieldPrefab, position, Quaternion.identity*Quaternion.Euler(0,-60,0));
     }
 
     private Texture2D createRandomTexture()
