@@ -100,6 +100,12 @@ public class GameManager : MonoBehaviour
         state = GameState.Picking;
     }
 
+    bool touchedUI = false;
+
+    public void NotifyTouchedUI() {
+        touchedUI = true;
+    }
+
     private void HandleFightResult(Creature winner)
     {
         StartCoroutine(DoHandleFightResult(winner));
@@ -187,64 +193,70 @@ public class GameManager : MonoBehaviour
         }
 
         if (state == GameState.Picking && touchAction.WasPerformedThisFrame()) {
-            state = GameState.CreatureConfirmation;
             StartCoroutine(CreateCreatureFromImage());
         }
     }
 
     private IEnumerator CreateCreatureFromImage() {
-        Vector2 pos;
-        if (Touchscreen.current != null) {
-            pos = Touchscreen.current.primaryTouch.position.value;
-        }
-        else {
-            pos = Mouse.current.position.value;
-        }
-        Vector2 screenSize = new Vector2(Screen.width, Screen.height);
-        Vector2 normalizedTouchPos = new Vector2(pos.x / screenSize.x, 1 - (pos.y / screenSize.y));
-        Debug.Log("Touch at  " + pos + ", screen size: " + screenSize + ", normalized pos: " + normalizedTouchPos);
-        var texture = segmentation.TakeSnapshot();
-
-        if (texture != null) {
-            yield return null;
-            
-            var spawnPosition = GetCreatureSpawnPosition(pos);
-            var particles = Instantiate(spawnParticles, spawnPosition, Quaternion.identity);
-            yield return segmentation.SegmentTexture(texture, normalizedTouchPos);
-            Destroy(texture);
-            if (segmentation.SegmentResult == null) {
-                state = GameState.Picking;
-            } else {
-                var segmentedTexture = segmentation.SegmentResult;
-                var croppedTexture = segmentation.CroppedTextureWithBackground;
-                if (segmentedTexture == null) {
-                    state = GameState.Picking; // Revert to picking state
-                } else {
-                    classification.Classify(croppedTexture);
-                    Destroy(croppedTexture);
-
-                    yield return null;
-
-                    if (currentCreature == null) {
-                        currentCreature = CreatureCreator.CreateDummyCreature();
-                        currentCreature.gameObject.SetActive(false);
-                    }
-                    var spawnPositionOffsetBack = spawnPosition + Camera.main.transform.forward * 0.15f;
-                    newCreature = CreatureCreator.CreateCreature(segmentedTexture, classification.Prediction, spawnPositionOffsetBack);
-                    newCreature.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
-
-                    yield return new WaitForSeconds(0.3f);
-
-                    particles.GetComponent<ParticleSystem>().Stop();
-                    Destroy(particles, 5);
-
-                    yield return new WaitForSeconds(1f);
-
-                    yield return CreatureShowcase(classification.Prediction);
-                }
-            }
+        yield return null;
+        if (touchedUI) {
+            touchedUI = false;
         } else {
-            state = GameState.Picking;
+            state = GameState.CreatureConfirmation;
+
+            Vector2 pos;
+            if (Touchscreen.current != null) {
+                pos = Touchscreen.current.primaryTouch.position.value;
+            }
+            else {
+                pos = Mouse.current.position.value;
+            }
+            Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+            Vector2 normalizedTouchPos = new Vector2(pos.x / screenSize.x, 1 - (pos.y / screenSize.y));
+            Debug.Log("Touch at  " + pos + ", screen size: " + screenSize + ", normalized pos: " + normalizedTouchPos);
+            var texture = segmentation.TakeSnapshot();
+
+            if (texture != null) {
+                yield return null;
+                
+                var spawnPosition = GetCreatureSpawnPosition(pos);
+                var particles = Instantiate(spawnParticles, spawnPosition, Quaternion.identity);
+                yield return segmentation.SegmentTexture(texture, normalizedTouchPos);
+                Destroy(texture);
+                if (segmentation.SegmentResult == null) {
+                    state = GameState.Picking;
+                } else {
+                    var segmentedTexture = segmentation.SegmentResult;
+                    var croppedTexture = segmentation.CroppedTextureWithBackground;
+                    if (segmentedTexture == null) {
+                        state = GameState.Picking; // Revert to picking state
+                    } else {
+                        classification.Classify(croppedTexture);
+                        Destroy(croppedTexture);
+
+                        yield return null;
+
+                        if (currentCreature == null) {
+                            currentCreature = CreatureCreator.CreateDummyCreature();
+                            currentCreature.gameObject.SetActive(false);
+                        }
+                        var spawnPositionOffsetBack = spawnPosition + Camera.main.transform.forward * 0.15f;
+                        newCreature = CreatureCreator.CreateCreature(segmentedTexture, classification.Prediction, spawnPositionOffsetBack);
+                        newCreature.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+
+                        yield return new WaitForSeconds(0.3f);
+
+                        particles.GetComponent<ParticleSystem>().Stop();
+                        Destroy(particles, 5);
+
+                        yield return new WaitForSeconds(1f);
+
+                        yield return CreatureShowcase(classification.Prediction);
+                    }
+                }
+            } else {
+                state = GameState.Picking;
+            }
         }
     }
 
