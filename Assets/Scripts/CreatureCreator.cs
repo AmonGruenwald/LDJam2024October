@@ -33,6 +33,7 @@ public class CreatureCreator : MonoBehaviour
             .SetId(idCounter++)
             .SetStats(1, 3, 1, 1, 1, Element.Wood)
             .SetImage(DummyImage);
+        creatureComponent.Name = "Fighting Dummy";
         return creatureComponent;
     }
 

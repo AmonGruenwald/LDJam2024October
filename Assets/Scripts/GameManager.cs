@@ -19,6 +19,19 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     bool DebugTrigger = false;
 
+    [SerializeField] private GameObject introUI;
+    [SerializeField] private AnimationClip introUIHideAnimation;
+
+    [SerializeField] private GameObject mainUI;
+    [SerializeField] private TextMeshProUGUI streakText;
+    [SerializeField] private TextMeshProUGUI hiScoreText;
+    [SerializeField] private TextMeshProUGUI nameMainUI;
+    [SerializeField] private TextMeshProUGUI highestStatMainUI;
+    [SerializeField] private TextMeshProUGUI lowestStatMainUi;
+    [SerializeField] private Image elementImageMainUi;
+    [SerializeField] private TextMeshProUGUI elementNameMainUi;
+
+    [SerializeField] private Button advanceIntroButton;
     [SerializeField] private GameObject creatureShowcaseUI;
     [SerializeField] private Transform creatureShowcasePoint;
     [SerializeField] private Button keepButton;
@@ -32,6 +45,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Image elementImage;
     [SerializeField] private TextMeshProUGUI elementName;
 
+    [SerializeField] private GameObject victoryDefeatUI;
+    [SerializeField] private Button victoryDefeatUIButton;
+    [SerializeField] private TextMeshProUGUI victoryDefeatUIMain;
+    [SerializeField] private TextMeshProUGUI victoryDefeatUIStreak;
+
     [SerializeField] private Sprite waterElemSprite;
     [SerializeField] private Sprite metalElemSprite;
     [SerializeField] private Sprite earthElemSprite;
@@ -40,36 +58,77 @@ public class GameManager : MonoBehaviour
 
     private Creature currentCreature;
     private Creature newCreature;
-    private GameState state = GameState.Picking;
+    private GameState state = GameState.Intro;
 
     private InputAction touchAction;
     private CreatureSegmentation segmentation;
     private CreatureClassification classification;
     private GameObject provisionalBattlefield;
 
-    void Start()
+    private int streak;
+    private int maxStreak;
+
+    IEnumerator Start()
     {
         segmentation = GetComponent<CreatureSegmentation>();
         classification = GetComponent<CreatureClassification>();
         touchAction = InputSystem.actions.FindAction("Touch");
         FightManager.OnFightComplete += HandleFightResult;
         creatureShowcaseUI.SetActive(false);
+        maxStreak = PlayerPrefs.GetInt("hiscore", 0);
+
+        currentCreature = CreatureCreator.CreateDummyCreature();
+        currentCreature.gameObject.SetActive(false);
+
+        introUI.GetComponent<Animation>().Play();
+
+        yield return new WaitForSeconds(3f);
+
+        advanceIntroButton.onClick.AddListener(() => {
+            StartCoroutine(CoroAdvanceIntro());
+            advanceIntroButton.onClick.RemoveAllListeners();
+        });
     }
 
+    private IEnumerator CoroAdvanceIntro() {
+        introUI.GetComponent<Animation>().clip = introUIHideAnimation;
+        introUI.GetComponent<Animation>().Play();
+
+        yield return new WaitForSeconds(1f);
+        Destroy(introUI);
+        
+        state = GameState.Picking;
+    }
 
     private void HandleFightResult(Creature winner)
     {
-        state = GameState.Picking;
+        StartCoroutine(DoHandleFightResult(winner));
+    }
+
+    private IEnumerator DoHandleFightResult(Creature winner) {
+
         if (winner.Equals(currentCreature))
         {
+            yield return ShowVictoryOrDefeat(false);
+
             Destroy(currentCreature.gameObject);
             Destroy(newCreature.gameObject);
             currentCreature = CreatureCreator.CreateDummyCreature();
             Debug.Log("U lost");
+
+            streak = 0;
         }
         else
         {
+            streak++;
+            if (streak > maxStreak) {
+                maxStreak = streak;
+                PlayerPrefs.SetInt("hiscore", streak);
+            }
             Debug.Log("Game continues");
+
+            yield return ShowVictoryOrDefeat(true);
+
             Destroy(currentCreature.gameObject);
             currentCreature = newCreature;
             currentCreature.CurrentHealth = currentCreature.Health;
@@ -79,10 +138,43 @@ public class GameManager : MonoBehaviour
             Destroy(provisionalBattlefield);
             provisionalBattlefield = null;
         }
+        FightManager.DestroyHealthBars();
 
+        state = GameState.Picking;
     }
+
+    private IEnumerator ShowVictoryOrDefeat(bool won) {
+        victoryDefeatUI.SetActive(true);
+        victoryDefeatUIMain.SetText(won ? "VICTORY" : "DEFEAT");
+        victoryDefeatUIMain.GetComponent<TypewriterFloatControl>().fullText = victoryDefeatUIMain.text;
+        victoryDefeatUIStreak.SetText(streak + " STREAK");
+        victoryDefeatUIStreak.GetComponent<TypewriterFloatControl>().fullText = victoryDefeatUIStreak.text;
+
+        var anim = victoryDefeatUI.GetComponent<Animation>();
+        anim.Play("UIShowFast");
+
+        yield return new WaitForSeconds(1.0f);
+
+        bool clicked = false;
+        victoryDefeatUIButton.onClick.AddListener(() => clicked = true);
+        while (!clicked) {
+            yield return null;
+        }
+        victoryDefeatUIButton.onClick.RemoveAllListeners();
+
+        anim.Play("WelcomeUIHide");
+        yield return new WaitForSeconds(1f);
+        victoryDefeatUI.SetActive(false);
+    }
+
     void Update()
     {
+        if (state == GameState.Picking || state == GameState.CreatureConfirmation) {
+            ShowMainUI();
+        } else {
+            HideMainUI();
+        }
+
         if (FightManager.FightRunning)
         {
             return;
@@ -179,34 +271,7 @@ public class GameManager : MonoBehaviour
         lowestStat.SetText(newCreature.LowestStat());
         highestStat.SetText(newCreature.HighestStat());
         
-        string elementString = "";
-        Sprite elementImage;
-
-        switch (newCreature.Element)
-        {
-            case Element.Water:
-                elementString = "Water";
-                elementImage = waterElemSprite;
-                break;
-            case Element.Metal:
-                elementString = "Metal";
-                elementImage = metalElemSprite;
-                break;
-            case Element.Earth:
-                elementString = "Earth";
-                elementImage = earthElemSprite;
-                break;
-            case Element.Fire:
-                elementString = "Fire";
-                elementImage = fireElemSprite;
-                break;
-            case Element.Wood:
-                elementString = "Wood";
-                elementImage = woodElemSprite;
-                break;
-        }
-
-        elementName.SetText(elementString);
+        SetElementNameAndImage(elementName, elementImage, newCreature.Element);
 
         creatureShowcaseUI.GetComponent<Animation>()["UIShow"].speed = 1.0f;
         creatureShowcaseUI.GetComponent<Animation>()["UIShow"].time = 0.0f;
@@ -311,9 +376,82 @@ public class GameManager : MonoBehaviour
         texture.Apply();
         return texture;
     }
+
+    void SetElementNameAndImage(TextMeshProUGUI text, Image image, Element element) {
+        string elementString = "";
+        Sprite elementSprite = waterElemSprite;
+
+        switch (element)
+        {
+            case Element.Water:
+                elementString = "Water";
+                elementSprite = waterElemSprite;
+                break;
+            case Element.Metal:
+                elementString = "Metal";
+                elementSprite = metalElemSprite;
+                break;
+            case Element.Earth:
+                elementString = "Earth";
+                elementSprite = earthElemSprite;
+                break;
+            case Element.Fire:
+                elementString = "Fire";
+                elementSprite = fireElemSprite;
+                break;
+            case Element.Wood:
+                elementString = "Wood";
+                elementSprite = woodElemSprite;
+                break;
+        }
+
+        text.SetText(elementString);
+        image.sprite = elementSprite;
+    }
+
+    private void ShowMainUI() {
+        if (!mainUI.activeSelf) {
+            var anim = mainUI.GetComponent<Animation>();
+            anim["ShowMainUIAnim"].speed = 1f;
+            anim.Play("ShowMainUIAnim");
+            mainUI.SetActive(true);
+        }
+
+        if (currentCreature) {
+            streakText.SetText(streak + " STREAK");
+            hiScoreText.SetText("Hi-Score: " + maxStreak);
+
+            nameMainUI.SetText("<b>Enemy</b>\n" + currentCreature.Name);
+            highestStatMainUI.SetText(currentCreature.HighestStat());
+            lowestStatMainUi.SetText(currentCreature.LowestStat());
+            SetElementNameAndImage(elementNameMainUi, elementImageMainUi, currentCreature.Element);
+        } else {
+            nameMainUI.SetText("currentCreature is null, oh no");
+        }
+    }
+
+    bool hidingMainUI = false;
+
+    private void HideMainUI() {
+        if (mainUI.activeSelf && !hidingMainUI) {
+            hidingMainUI = true;
+            StartCoroutine(HideMainUICoro());
+        }
+    }
+
+    private IEnumerator HideMainUICoro() {
+        var anim = mainUI.GetComponent<Animation>();
+        anim["ShowMainUIAnim"].time = 0.40f;
+        anim["ShowMainUIAnim"].speed = -1f;
+        anim.Play("ShowMainUIAnim");
+        yield return new WaitForSeconds(0.5f);
+        mainUI.SetActive(false);
+        hidingMainUI = false;
+    }
 }
 
 public enum GameState {
+    Intro,
     Picking,
     CreatureConfirmation,
     Fighting

@@ -5,7 +5,7 @@ public class TypewriterFloatControl : MonoBehaviour
 {
     [Range(0, 1)] public float revealProgress = 1; // Controls text reveal from 0 (invisible) to 1 (fully visible)
     public TextMeshProUGUI textMeshPro; // Reference to the TextMeshPro component
-    private string fullText;
+    public string fullText;
 
     private void OnEnable()
     {

@@ -9,12 +9,20 @@ public class FightManager : MonoBehaviour
     public Transform FightSpot;
     [SerializeField]
     public float Distance = 4.0f;
+
+    [SerializeField]
+    public GameObject HealthBarPrefab;
+
     public bool FightRunning = false;
     public event Action<Creature> OnFightComplete;
 
     private float attackSpeedFactor = 0.3f;
     private Creature a;
     private Creature b;
+
+    private HealthBar creatureABar;
+    private HealthBar creatureBBar;
+
     private void FixedUpdate()
     {
         if (!FightRunning)
@@ -47,6 +55,13 @@ public class FightManager : MonoBehaviour
             Debug.Log("#" + b.id + " died");
             completeFight(a);
         }
+
+        if (creatureABar) {
+            creatureABar.currentHealth = a.CurrentHealth;
+        }
+        if (creatureBBar) {
+            creatureBBar.currentHealth = b.CurrentHealth;
+        }
     }
     public IEnumerator StartFight(Creature a, Creature b, Transform fightSpot)
     {
@@ -66,11 +81,32 @@ public class FightManager : MonoBehaviour
             a.Legs[i].StartFootTween();
             b.Legs[i].StartFootTween();
         }
+
+        SpawnHealthBars();
+
         FightRunning = true;
     }
     private void completeFight(Creature winner)
     {
         FightRunning = false;
         OnFightComplete(winner);
+    }
+
+    private void SpawnHealthBars() {
+        var barAGo = Instantiate(HealthBarPrefab, a.transform.position + Vector3.up * 0.25f, Quaternion.identity);
+        var barBGo = Instantiate(HealthBarPrefab, b.transform.position + Vector3.up * 0.25f, Quaternion.identity);
+
+        creatureABar = barAGo.GetComponent<HealthBar>();
+        creatureBBar = barBGo.GetComponent<HealthBar>();
+
+        creatureABar.maxHealth = a.Health;
+        creatureBBar.maxHealth = b.Health;
+        creatureABar.currentHealth = a.CurrentHealth;
+        creatureBBar.currentHealth = b.CurrentHealth;
+    }
+
+    public void DestroyHealthBars() {
+        Destroy(creatureABar.gameObject);
+        Destroy(creatureBBar.gameObject);
     }
 }
