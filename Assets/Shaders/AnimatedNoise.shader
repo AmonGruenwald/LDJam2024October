@@ -8,6 +8,7 @@ Shader "Custom/ParticleCircleTextureWithColor"
         _Radius ("Circle Radius", Float) = 0.5        // Radius of the circle (0.0 - 0.5)
         _JumpFrequency ("Jump Frequency", Float) = 0.5 // How often to jump (in seconds)
         _EdgeSoftness ("Edge Softness", Float) = 0.05 // Softness of the circle's edge
+        _Add ("Add", Color) = (0.0, 0.0, 0.0, 0.0)  // Softness of the circle's edge
     }
     SubShader
     {
@@ -46,6 +47,7 @@ Shader "Custom/ParticleCircleTextureWithColor"
             float _Radius;
             float _JumpFrequency;
             float _EdgeSoftness;
+            float4 _Add;
 
             // Random function to create pseudo-random values for jumps
             float random(float2 st)
@@ -93,6 +95,8 @@ Shader "Custom/ParticleCircleTextureWithColor"
 
                     // Modulate the texture color by the particle's color over lifetime
                     col *= i.color;
+
+                    col += _Add;
 
                     // Return the sampled texture color inside the circle with modulated alpha
                     return fixed4(col.rgb, col.a * alpha);

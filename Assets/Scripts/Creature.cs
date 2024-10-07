@@ -91,6 +91,7 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
     }
     public Creature SetStats(CreatureDescription description)
     {
+        Name = description.name;
         return SetStats(description.speed, description.health, description.defense, description.strength, description.evasion, description.element);
     }
 
@@ -217,5 +218,51 @@ public class Creature : MonoBehaviour, IEquatable<Creature>
         Vector3 scale = transform.localScale;
         scale.x = scale.y * textureAspectRatio;
         transform.localScale = scale;
+    }
+
+    public string HighestStat() {
+        float highest = Speed;
+        string stat = "Speed";
+        if (Health > highest) {
+            highest = Health;
+            stat = "Health";
+        }
+        if (Defense > highest) {
+            highest = Defense;
+            stat = "Defense";
+        }
+        if (Strength > highest) {
+            highest = Strength;
+            stat = "Strength";
+        }
+        if (Evasion > highest) {
+            highest = Evasion;
+            stat = "Evasion";
+        }
+
+        return stat;
+    }
+
+    public string LowestStat() {
+        float lowest = Speed;
+        string stat = "Speed";
+        if (Health < lowest) {
+            lowest = Health;
+            stat = "Health";
+        }
+        if (Defense < lowest) {
+            lowest = Defense;
+            stat = "Defense";
+        }
+        if (Strength < lowest) {
+            lowest = Strength;
+            stat = "Strength";
+        }
+        if (Evasion < lowest) {
+            lowest = Evasion;
+            stat = "Evasion";
+        }
+
+        return stat;
     }
 }

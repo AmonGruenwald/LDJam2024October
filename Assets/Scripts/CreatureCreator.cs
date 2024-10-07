@@ -17,7 +17,6 @@ public class CreatureCreator : MonoBehaviour
     private int idCounter = 0;
     void Start()
     {
-        // HACK: root must be an object, not a list
         statTemplates = JsonUtility.FromJson<SerializedCreatureDataListWrapper>(jsonData.text).data;
     }
 

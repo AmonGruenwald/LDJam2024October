@@ -22,6 +22,9 @@ public class CreatureSegmentation : MonoBehaviour
     public Texture2D TakeSnapshot()
     {
         var texture = ScreenCapture.CaptureScreenshotAsTexture();
+        if (!texture) {
+            return null;
+        }
         var textureNoAlpha = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false);
         var pixels = texture.GetPixels32();
         textureNoAlpha.SetPixels32(pixels);

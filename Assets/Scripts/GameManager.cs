@@ -27,18 +27,25 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject provisionalBattlefieldPrefab;
     [SerializeField] private TextMeshProUGUI creatureText;
     [SerializeField] private GameObject spawnParticles;
+    [SerializeField] private TextMeshProUGUI highestStat;
+    [SerializeField] private TextMeshProUGUI lowestStat;
+    [SerializeField] private Image elementImage;
+    [SerializeField] private TextMeshProUGUI elementName;
+
+    [SerializeField] private Sprite waterElemSprite;
+    [SerializeField] private Sprite metalElemSprite;
+    [SerializeField] private Sprite earthElemSprite;
+    [SerializeField] private Sprite fireElemSprite;
+    [SerializeField] private Sprite woodElemSprite;
 
     private Creature currentCreature;
     private Creature newCreature;
     private GameState state = GameState.Picking;
-    private RotateAroundObject rotationCamera;
 
     private InputAction touchAction;
     private CreatureSegmentation segmentation;
     private CreatureClassification classification;
     private GameObject provisionalBattlefield;
-
-    public Texture2D classificationTestTexture;
 
     void Start()
     {
@@ -107,39 +114,46 @@ public class GameManager : MonoBehaviour
         Debug.Log("Touch at  " + pos + ", screen size: " + screenSize + ", normalized pos: " + normalizedTouchPos);
         var texture = segmentation.TakeSnapshot();
 
-        yield return null;
-        
-        var spawnPosition = GetCreatureSpawnPosition(pos);
-        var particles = Instantiate(spawnParticles, spawnPosition, Quaternion.identity);
-        yield return segmentation.SegmentTexture(texture, normalizedTouchPos);
-        Destroy(texture);
-        if (segmentation.SegmentResult == null) {
-            state = GameState.Picking;
-        } else {
-            var segmentedTexture = segmentation.SegmentResult;
-            var croppedTexture = segmentation.CroppedTextureWithBackground;
-            if (segmentedTexture == null) {
-                state = GameState.Picking; // Revert to picking state
+        if (texture != null) {
+            yield return null;
+            
+            var spawnPosition = GetCreatureSpawnPosition(pos);
+            var particles = Instantiate(spawnParticles, spawnPosition, Quaternion.identity);
+            yield return segmentation.SegmentTexture(texture, normalizedTouchPos);
+            Destroy(texture);
+            if (segmentation.SegmentResult == null) {
+                state = GameState.Picking;
             } else {
-                classification.Classify(croppedTexture);
-                Destroy(croppedTexture);
+                var segmentedTexture = segmentation.SegmentResult;
+                var croppedTexture = segmentation.CroppedTextureWithBackground;
+                if (segmentedTexture == null) {
+                    state = GameState.Picking; // Revert to picking state
+                } else {
+                    classification.Classify(croppedTexture);
+                    Destroy(croppedTexture);
 
-                yield return null;
+                    yield return null;
 
-                if (currentCreature == null) {
-                    currentCreature = CreatureCreator.CreateDummyCreature();
-                    currentCreature.gameObject.SetActive(false);
+                    if (currentCreature == null) {
+                        currentCreature = CreatureCreator.CreateDummyCreature();
+                        currentCreature.gameObject.SetActive(false);
+                    }
+                    var spawnPositionOffsetBack = spawnPosition + Camera.main.transform.forward * 0.15f;
+                    newCreature = CreatureCreator.CreateCreature(segmentedTexture, classification.Prediction, spawnPositionOffsetBack);
+                    newCreature.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+
+                    yield return new WaitForSeconds(0.3f);
+
+                    particles.GetComponent<ParticleSystem>().Stop();
+                    Destroy(particles, 5);
+
+                    yield return new WaitForSeconds(2f);
+
+                    yield return CreatureShowcase(classification.Prediction);
                 }
-                newCreature = CreatureCreator.CreateCreature(segmentedTexture, classification.Prediction, spawnPosition);
-                newCreature.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
-
-                particles.GetComponent<ParticleSystem>().Stop();
-                Destroy(particles, 5);
-
-                yield return new WaitForSeconds(0.5f);
-
-                yield return CreatureShowcase(classification.Prediction, newCreature.name);
             }
+        } else {
+            state = GameState.Picking;
         }
     }
 
@@ -158,13 +172,49 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator CreatureShowcase(ClassificationPrediction prediction, string name) {
-        creatureShowcaseUI.SetActive(true);
-
-        creatureText.SetText(name);
-
+    private IEnumerator CreatureShowcase(ClassificationPrediction prediction) {
         float duration = 1.5f;
 
+        creatureText.SetText(newCreature.Name);
+        lowestStat.SetText(newCreature.LowestStat());
+        highestStat.SetText(newCreature.HighestStat());
+        
+        string elementString = "";
+        Sprite elementImage;
+
+        switch (newCreature.Element)
+        {
+            case Element.Water:
+                elementString = "Water";
+                elementImage = waterElemSprite;
+                break;
+            case Element.Metal:
+                elementString = "Metal";
+                elementImage = metalElemSprite;
+                break;
+            case Element.Earth:
+                elementString = "Earth";
+                elementImage = earthElemSprite;
+                break;
+            case Element.Fire:
+                elementString = "Fire";
+                elementImage = fireElemSprite;
+                break;
+            case Element.Wood:
+                elementString = "Wood";
+                elementImage = woodElemSprite;
+                break;
+        }
+
+        elementName.SetText(elementString);
+
+        creatureShowcaseUI.GetComponent<Animation>()["UIShow"].speed = 1.0f;
+        creatureShowcaseUI.GetComponent<Animation>()["UIShow"].time = 0.0f;
+        creatureShowcaseUI.GetComponent<Animation>().Play("UIShow");
+
+        yield return null;
+
+        creatureShowcaseUI.SetActive(true);
         newCreature.transform.SetParent(creatureShowcasePoint, true);
 
         newCreature.transform.DOLocalRotateQuaternion(Quaternion.identity, duration).SetEase(Ease.InFlash).SetEase(Ease.OutBounce);
@@ -189,6 +239,12 @@ public class GameManager : MonoBehaviour
 
         newCreature.transform.SetParent(null);
 
+        creatureShowcaseUI.GetComponent<Animation>()["UIShow"].speed = -2.0f;
+        creatureShowcaseUI.GetComponent<Animation>()["UIShow"].time = 3.0f;
+        creatureShowcaseUI.GetComponent<Animation>().Play("UIShow");
+
+        yield return new WaitForSeconds(1.0f);
+
         if (keep) {
             currentCreature.gameObject.SetActive(true);
             newCreature.ParticleSystem.Clear();
@@ -207,6 +263,8 @@ public class GameManager : MonoBehaviour
             state = GameState.Picking;
             Destroy(newCreature.gameObject);
         }
+
+        yield return new WaitForSeconds(1.0f);
         creatureShowcaseUI.SetActive(false);
     }
 
